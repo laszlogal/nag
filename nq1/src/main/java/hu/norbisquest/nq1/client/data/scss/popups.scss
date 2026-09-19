@@ -1,0 +1,87 @@
+@use 'common' as *;
+.title {
+    font: 24px arial;
+    color: white;
+    width: 100%;
+    text-align: center;
+}
+
+.loadDialog {
+    @extend .nq1dialog;
+    width: 200px;
+    height: 300px;
+    .nagListBox {
+        outline: none;
+        font: 24px arial;
+        color: white;
+        text-align: center;
+        margin: 24px;
+        width: 152px;
+        background: transparent;
+        border: 0;
+        overflow: hidden;
+
+        .options {
+            .item:hover {
+               background: $item-highlight;
+             }
+          }
+
+
+   }
+}
+
+.saveDialog {
+    @extend .loadDialog;
+    margin: 8px;
+    .gwt-TextBox {
+        @include border-radius(16px);
+        font: 18px arial;
+        text-align: center;
+        margin-top: 8px;
+        margin-left: 24px;
+        color: white;
+        width: 152px;
+        background: $input-background;
+        border: 0;
+        outline: none;
+        &:focus {
+            background: $input-background-active;
+        }
+    }
+
+    .nagListBox {
+        height: 148px;
+        margin-bottom: 8px;
+    }
+
+    .buttons {
+        @extend .nq1buttons;
+        width: 144px;
+        div {
+            background: transparent;
+            display: inline-block;
+        }
+        img {
+            width: 48px;
+            height: 48px;
+        }
+
+    }
+}
+
+.exitDialog {
+    @extend .nq1dialog;
+    width: 300px;
+    height: 160px;
+
+    .buttons {
+        @extend .nq1buttons;
+        width: 250px;
+        margin-top: 16px;
+     }
+
+    .popupContent {
+        margin-top: 16px;
+    }
+}

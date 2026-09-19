@@ -1,0 +1,48 @@
+@use 'common' as *;
+.inventoryDialog  {
+  @extend .nq1dialog;
+  width: 400px;
+  height: 300px;
+
+ .itemsPanel {
+	    padding: 8px;
+	    width: 400px;
+	    height: 212px;
+    	overflow: hidden;
+    	.gwt-Image {
+        	width: 48px;
+        	height: 48px;
+        	padding: 8px;
+        }
+    }
+
+    .buttons {
+    	position: relative;
+    	margin: auto;
+    	width: 144px;
+    	padding: 8px;
+        .ok {
+    	    float: right;
+        }
+
+        img {
+           width: 48px;
+           height: 48px;
+        }
+    }
+}
+
+.dummyItemImage {
+	opacity: 0.5;
+}
+
+.itemDragging {
+	transform: scale(1.5, 1.5);
+}
+
+.inventoryDialog-touch .itemsPanel .gwt-Image {
+	width: 48px;
+	height: 48px;
+	padding: 8px;
+	position: absolute;
+}

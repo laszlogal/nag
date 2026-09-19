@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.docstr.gwt'
+}
+
+def devModule = 'hu.norbisquest.nq1.NQ1'
+def warDirRel = 'war'
+def cordovaWWW = 'mobile/www'
+
+dependencies {
+    implementation project(':nqcommon')
+
+    implementation 'com.google.gwt:gwt-user:2.13.1'
+}
+
+gwt {
+    gwtVersion = '2.13.1'
+
+    modules = [devModule]
+
+    maxHeapSize = '1024M'
+
+    compiler {
+        strict = true
+        style = 'PRETTY'
+    }
+}

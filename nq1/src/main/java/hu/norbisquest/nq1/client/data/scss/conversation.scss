@@ -1,0 +1,69 @@
+@use 'common' as *;
+
+.conversationPanel,
+.conversationPanel-android {
+	position: absolute;
+	left: 0;
+	opacity: 0.8;
+	z-index: 9999;
+}
+
+@keyframes topicFadeIn {
+    from {
+        background-color: rgba(0, 0, 0, 0.0);
+        opacity: 0;
+        padding-top: 0;
+    }
+
+    to {
+        background-color: $black-87;
+        opacity: 1;
+        padding-top: 8px;
+    }
+}
+
+@keyframes topicFadeOut {
+    from {
+        background-color: $black-87;
+        color: white;
+        opacity: 1;
+        padding-top: 8px;
+    }
+
+    to {background-color: rgba(0, 0, 0, 0.0);
+          color: rgba(0, 0, 0, 0.0);
+          opacity: 0.87;
+          padding-top: 0;
+    }
+}
+
+.conversationPanel-android {
+    .topic {
+        background-color:rgba(0, 0, 0, 0.0 );
+        color: white;
+        opacity: 0;
+        font: $nag-font;
+        text-align: center;
+        border-radius: 20px;
+        margin: 12px 48px 12px 48px;
+        margin-bottom: 12px;
+        min-height: 32px;
+        max-width: 600px;
+        padding-top: 8px;
+        animation-name: topicFadeIn;
+        animation-duration: 1s;
+        animation-timing-function: ease;
+        animation-fill-mode: forwards;
+      }
+
+      .out  {
+          @extend .topic;
+          opacity: 1;
+          animation-name: topicFadeOut;
+      }
+
+      .selected  {
+          @extend .out;
+          animation-duration: 3s;
+       }
+ }

@@ -1,0 +1,71 @@
+$black-7: rgba(9, 12, 18, 0.72);
+$black-84: rgba(9, 12, 18, 0.84);
+$black-87: rgba(9, 12, 18, 0.9);
+$text-background: $black-7;
+$menu-highlight: rgba(255, 255, 255, 0.14);
+$input-background: rgba(222, 222, 222, 0.2);
+$input-background-active: rgba(222, 222, 222, 0.4);
+$border-color: rgba(255, 255, 255, 0.18);
+$item-highlight: $menu-highlight;
+$nag-font: 24px Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+$surface: linear-gradient(145deg, rgba(32, 38, 50, 0.92), rgba(13, 17, 25, 0.86));
+$surface-border: 1px solid rgba(255, 255, 255, 0.16);
+$surface-shadow: 0 10px 28px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+$accent: #f4c95d;
+
+@mixin border-radius($rad) {
+    -webkit-border-radius: $rad;
+    -moz-border-radius: $rad;
+    border-radius: $rad;
+}
+
+@mixin box-shadow($value) {
+    -webkit-box-shadow: $value;
+    -moz-box-shadow: $value;
+    box-shadow: $value;
+
+}
+
+.nq1dialog  {
+    @include border-radius(64px);
+    @include box-shadow(2px 2px 4px #888);
+    background: rgba(1, 1, 1,.7);
+    border: 4px solid #666;
+
+    .gwt-PushButton {
+        padding: 3px 12px 3px 12px;
+     	display: inline-block;
+        background: transparent;
+     	&:focus {
+         	outline: none;
+         }
+     }
+
+     .gwt-PushButton-down,
+     .gwt-PushButton-down-hovering {
+         padding: 3px 12px 3px 12px;
+      }
+ }
+
+.nq1buttons {
+    position: relative;
+    margin: auto;
+    padding: 0;
+    margin-top: 0px;
+    div {
+        background: transparent;
+        display: inline-block;
+    }
+}
+
+.hidden {
+    opacity: 0;
+}
+
+.noSelect {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -user-select: none;
+    -ms-user-select: none;
+}

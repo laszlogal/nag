@@ -1,0 +1,80 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.docstr.gwt'
+    id 'io.miret.etienne.sass'
+}
+
+def devModule = 'hu.norbisquest.nq1.NQ1'
+def generatedSassDir = layout.buildDirectory.dir('generated/gwt-sass')
+def generatedSassPackage = 'hu/norbisquest/nq1/client/data/css'
+
+dependencies {
+    implementation project(':nqcommon')
+    implementation 'org.gwtproject:gwt-user:2.13.1'
+    implementation project(':nag')
+}
+
+gwt {
+    gwtVersion = '2.13.1'
+
+    modules = [devModule]
+
+    extraSourceDirs = files(
+        rootProject.file('nag/src/main/java'),
+        rootProject.file('nqcommon/src/main/java'),
+        generatedSassDir
+    )
+
+    maxHeapSize = '1024M'
+
+    compiler {
+        strict = true
+        style = 'PRETTY'
+    }
+
+    devMode {
+        war = file('war')
+        bindAddress = project.findProperty('gbind') ?: '127.0.0.1'
+    }
+}
+
+sass {
+    version = '1.104.1'
+    noAutoCopy()
+}
+
+compileSass {
+    sourceDir = file('src/main/java/hu/norbisquest/nq1/client/data/scss')
+    outputDir = generatedSassDir.get().asFile
+    destPath = generatedSassPackage
+    style = compressed
+    sourceMap = none
+    noCharset()
+    noErrorCss()
+
+    entryPoint 'actors.scss', 'actors.css'
+    entryPoint 'buttonpanel.scss', 'buttonpanel.css'
+    entryPoint 'conversation.scss', 'conversation.css'
+    entryPoint 'inventory.scss', 'inventory.css'
+    entryPoint 'main.scss', 'main.css'
+    entryPoint 'burgermenu.scss', 'burgermenu.css'
+    entryPoint 'toolbar.scss', 'toolbar.css'
+    entryPoint 'popups.scss', 'popups.css'
+}
+
+tasks.named('gwtCompile') {
+    dependsOn tasks.named('compileSass')
+}
+
+tasks.named('compileJava') {
+    dependsOn tasks.named('compileSass')
+}
+
+tasks.named('gwtDevMode') {
+    dependsOn tasks.named('compileSass')
+}
+
+tasks.named('gwtSuperDev') {
+    dependsOn tasks.named('compileSass')
+}

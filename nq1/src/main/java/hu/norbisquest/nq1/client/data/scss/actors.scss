@@ -1,0 +1,41 @@
+@use 'common' as *;
+
+.subtitle {
+	position: absolute;
+	background: rgba(0, 0, 0, .4);
+	width: 200px;
+	text-align: center;
+	border-radius: 10px;
+	text-shadow: 2px 2px 10px #000000;
+	font: $nag-font bold;
+	z-index: 99999;
+}
+
+.subtitle-touch  {
+	position: absolute;
+	left: 0px;
+	width: 100%;
+	top: 0px;
+	background: rgba(0, 0, 0, .8);
+	text-align: center;
+	border-radius: 10px;
+	text-shadow: 2px  2px 10px #000000;
+	font: $nag-font bold;
+	z-index: 99999;
+}
+
+
+.norbi {
+	color: yellow;
+}
+
+.newsAgent {
+	color: red;
+}
+
+.hobo,
+.busDriver,
+.punk,
+.szurdi {
+	color: #e53c78;
+}

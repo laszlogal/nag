@@ -1,0 +1,5 @@
+rootProject.name = 'Norbi Adventure Games'
+
+include 'nag'
+include 'nqcommon'
+include 'nq1'
