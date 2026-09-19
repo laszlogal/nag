@@ -1,0 +1,52 @@
+@use 'common' as *;
+
+$panelWidth: 52px;
+$panelHeight: 52px;
+
+.floatButton {
+    box-sizing: border-box;
+    width: $panelWidth;
+    height: $panelHeight;
+    padding: 2px;
+    background: $surface;
+    border: $surface-border;
+    border-radius: 16px;
+    box-shadow: $surface-shadow;
+    cursor: pointer;
+    transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    outline: none;
+
+    &:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    &:active,
+    &.gwt-ToggleButton-down,
+    &.gwt-ToggleButton-down-hovering {
+        transform: translateY(0) scale(0.96);
+        background: linear-gradient(145deg, rgba(92, 76, 37, 0.96), rgba(24, 24, 24, 0.92));
+        border-color: rgba(244, 201, 93, 0.72);
+    }
+
+    img {
+        display: block;
+        margin: 5px;
+        width: 36px;
+        height: 36px;
+    }
+    margin: 0;
+}
+
+.buttonPanel {
+    position: absolute;
+    width: $panelWidth;
+    height: $panelHeight;
+    top: auto;
+    right: 12px;
+    bottom: 12px;
+    left: auto;
+    margin: 0;
+    z-index: 999999;
+}
