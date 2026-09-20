@@ -8,10 +8,7 @@ import hu.norbisquest.nagbase.core.Browser;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Cursor;
 import hu.norbisquest.nagbase.game.Settings;
-import hu.norbisquest.nagbase.game.engine.Engine;
-import hu.norbisquest.nagbase.game.engine.GameDisplay;
-import hu.norbisquest.nagbase.game.engine.GameLoop;
-import hu.norbisquest.nagbase.game.engine.ScreenProvider;
+import hu.norbisquest.nagbase.game.engine.*;
 import hu.norbisquest.nagbase.game.target.ItemFactory;
 import hu.norbisquest.nagbase.resources.StyleInjector;
 
@@ -37,7 +34,7 @@ public abstract class GameBuilder {
         ScreenProvider provider = ceateScreenProvider(gui);
         GameDisplay display = new GameDisplay();
         provider.addRequestHandler(display);
-        GameLoop gameLoop = new GameLoop(display, fps);
+        GameLoop gameLoop = new GameLoop(display, new GwtGameSheduler(), fps);
         engine = new Engine(gameLoop, display);
         engine.addChangeScreenHandler(gui);
         provider.changeScreen(App.getSettings().getStartId());

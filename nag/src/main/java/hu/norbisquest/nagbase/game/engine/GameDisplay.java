@@ -9,11 +9,12 @@ import hu.norbisquest.nagbase.game.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class  GameDisplay extends NAGObject implements ScreenRequest {
+public class  GameDisplay extends NAGObject implements ScreenRequest, LoopTarget {
 
     private GameScreen screen;
     private boolean changed;
     private List<ChangeScreen> changeHandlers = new ArrayList<>();
+
     enum DefaultID implements Stage.Id {
         DEFAULT_ID;
 
@@ -21,8 +22,8 @@ public class  GameDisplay extends NAGObject implements ScreenRequest {
         public Stage.Id toId(String name) {
             return null;
         }
-    }
 
+    }
     public GameDisplay() {
         changed = false;
     }
@@ -124,5 +125,15 @@ public class  GameDisplay extends NAGObject implements ScreenRequest {
     @Override
     public void onScreenCreated(GameScreen screen) {
         setScreen(screen);
+    }
+
+    @Override
+    public void update(double timestamp) {
+        if (isScreenChanged()) {
+            screen.show();
+            changed = false;
+        } else {
+            executeScreen(timestamp);
+        }
     }
 }
