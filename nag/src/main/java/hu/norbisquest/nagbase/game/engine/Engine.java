@@ -32,4 +32,9 @@ public class Engine implements GameEngine {
     public void run() {
         gameLoop.start();
     }
+
+    @Override
+    public void stop() {
+        gameLoop.stop();
+    }
 }

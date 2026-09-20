@@ -194,18 +194,6 @@ public final class App {
 		App.debug("[BLOCK] " + value);
 	}
 
-	public static double getTimestamp() {
-		return timestamp;
-	}
-
-	public static boolean isTick(int speed) {
-		return timestamp % speed == 0;
-	}
-
-	public static void setTimestamp(double timestamp) {
-		App.timestamp = timestamp;
-	}
-
 	public static Inventory getInventory() {
 		if (inventory == null) {
 			inventory = new Inventory();

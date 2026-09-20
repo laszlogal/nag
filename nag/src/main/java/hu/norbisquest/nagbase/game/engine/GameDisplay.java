@@ -43,7 +43,8 @@ public class  GameDisplay extends NAGObject implements ScreenRequest, LoopTarget
         }
     }
 
-    void process(double timestamp) {
+    @Override
+    public void update(double timestamp) {
         if (isScreenChanged()) {
             screen.show();
             changed = false;
@@ -52,7 +53,7 @@ public class  GameDisplay extends NAGObject implements ScreenRequest, LoopTarget
         }
     }
 
-    private void executeScreen(double timestamp) {
+   private void executeScreen(double timestamp) {
         if (isScreenValid()) {
             screen.execute(timestamp);
         }
@@ -125,15 +126,5 @@ public class  GameDisplay extends NAGObject implements ScreenRequest, LoopTarget
     @Override
     public void onScreenCreated(GameScreen screen) {
         setScreen(screen);
-    }
-
-    @Override
-    public void update(double timestamp) {
-        if (isScreenChanged()) {
-            screen.show();
-            changed = false;
-        } else {
-            executeScreen(timestamp);
-        }
     }
 }

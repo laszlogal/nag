@@ -12,4 +12,6 @@ public interface GameEngine {
     Stage getCurrentStage();
 
     void run();
+
+    void stop();
 }

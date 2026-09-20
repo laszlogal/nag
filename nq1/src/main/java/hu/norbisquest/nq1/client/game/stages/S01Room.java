@@ -46,8 +46,7 @@ public class S01Room extends NQ1Stage {
 
 		@Override
 		public List<Command> onUse(int x, int y) {
-			return walkAndSay(App
-					.getTimestamp() % 2 == 0
+			return walkAndSay(Math.random() < 0.5
 							? N01.DONT_READ_NOW
 							: N01.NO_SECRET_PASS);
 		}

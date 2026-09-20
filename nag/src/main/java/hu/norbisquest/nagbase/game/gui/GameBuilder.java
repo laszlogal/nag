@@ -34,7 +34,7 @@ public abstract class GameBuilder {
         ScreenProvider provider = ceateScreenProvider(gui);
         GameDisplay display = new GameDisplay();
         provider.addRequestHandler(display);
-        GameLoop gameLoop = new GameLoop(display, new GwtGameSheduler(), fps);
+        GameLoop gameLoop = new GameLoop(display, new GwtFrameScheduler(), fps);
         engine = new Engine(gameLoop, display);
         engine.addChangeScreenHandler(gui);
         provider.changeScreen(App.getSettings().getStartId());

@@ -432,28 +432,11 @@ public abstract class NQStage extends Stage {
 			return;
 		}
 		update();
-//		updateNorbi();
 		if (isProcessorIdle()) {
 			App.getAudioManager().restoreMusicVolume();
 		}
-		}
-
-	private void updateNorbi() {
-		if (getNorbi().tick(App.getTimestamp())) {
-			Walker norbi = getNorbi();
-			if (norbi.isWalking()) {
-				int middleX = App.getWidth() / 2;
-				WalkPoint wp = norbi.getPosition();
-				int diff = norbi.getWalkSpeed();
-				double x = wp.getX() + getLeft();
-				if (norbi.isFacingLeft() && getLeft() < 0 && x < middleX) {
-					moveLeft(diff);
-				} else if (norbi.isFacingRight() && getLeft() > App.WIDTH - getWidth() && x > middleX) {
-					moveLeft(-diff);
-				}
-			}
-		}
 	}
+
 
 	private void update() {
 		Layer fg = getForeground();
