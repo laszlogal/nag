@@ -11,12 +11,13 @@ import hu.norbisquest.nagbase.game.App.GameModes;
 import hu.norbisquest.nagbase.game.Cursor;
 import hu.norbisquest.nagbase.game.Settings;
 import hu.norbisquest.nagbase.game.Settings.SettingsChanged;
-import hu.norbisquest.nagbase.game.engine.ScreenProvider;
+import hu.norbisquest.nagbase.game.engine.ScreenFactory;
 import hu.norbisquest.nagbase.game.gui.GameBuilder;
 import hu.norbisquest.nagbase.game.target.ItemFactory;
 import hu.norbisquest.nq1.client.data.bundle.CSS;
 import hu.norbisquest.nq1.client.factory.InventoryFactory;
 import hu.norbisquest.nq1.client.factory.NQ1Ids;
+import hu.norbisquest.nq1.client.factory.NQ1StageFactory;
 import hu.norbisquest.nq1.client.gui.dialog.NQ1DialogManager;
 
 import java.util.List;
@@ -59,8 +60,8 @@ public class NQ1Builder extends GameBuilder {
 	}
 
 	@Override
-	public ScreenProvider ceateScreenProvider(HasContent parent) {
-		return new NQ1ScreenProvider(parent);
+	public ScreenFactory createScreenFactory(HasContent parent) {
+		return new NQ1StageFactory(parent);
 	}
 
 	@Override

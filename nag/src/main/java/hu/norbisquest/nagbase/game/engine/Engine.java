@@ -6,11 +6,13 @@ import hu.norbisquest.nagbase.game.Stage;
 
 public class Engine implements GameEngine {
     private final GameLoop gameLoop;
-    private GameDisplay display;
+    private final GameDisplay display;
+    private final ScreenCoordinator screenCoordinator;
 
-    public Engine(GameLoop gameLoop, GameDisplay display) {
+    public Engine(GameLoop gameLoop, GameDisplay display, ScreenCoordinator screenCoordinator) {
         this.gameLoop = gameLoop;
         this.display = display;
+        this.screenCoordinator = screenCoordinator;
     }
 
     @Override
@@ -36,5 +38,6 @@ public class Engine implements GameEngine {
     @Override
     public void stop() {
         gameLoop.stop();
+        screenCoordinator.stop();
     }
 }

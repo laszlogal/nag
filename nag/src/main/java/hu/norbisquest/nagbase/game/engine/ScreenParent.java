@@ -6,4 +6,5 @@ import hu.norbisquest.nagbase.common.engine.GameScreen;
 public interface ScreenParent {
     FlowPanel getPanel();
     void onScreenCreated(GameScreen screen);
+    void onScreenCreationFailed(Throwable cause);
 }

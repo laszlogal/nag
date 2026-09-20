@@ -114,8 +114,10 @@ public abstract class NQ1Stage extends NQStage {
 
 	@Override
 	public void destroyHeroes() {
+		// Norbi is a session-owned singleton shared with the next stage. Screen
+		// candidates are constructed before the previous stage is destroyed, so
+		// destroying him here would invalidate the already-created next stage.
 		removeActor(Norbi.get());
-		Norbi.destroyInstance();
 	}
 
 	@Override

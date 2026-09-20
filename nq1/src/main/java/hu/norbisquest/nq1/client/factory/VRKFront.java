@@ -8,7 +8,7 @@ import hu.norbisquest.nq1.client.game.stages.S08VRKFront;
 
 class VRKFront {
 	public static void create(final ScreenParent parent) {
-		GWT.runAsync(new StageAsyncCreator() {
+		GWT.runAsync(new StageAsyncCreator(parent) {
 			@Override
 			public StageFactory createFactory() {
 				return StageFactory1.create(parent, new VRKFrontModel());}

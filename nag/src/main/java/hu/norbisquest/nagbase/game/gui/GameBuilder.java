@@ -31,13 +31,16 @@ public abstract class GameBuilder {
         App.getInventory().setFactory(getItemFactory());
 
         gui = createGui(createDialogManager());
-        ScreenProvider provider = ceateScreenProvider(gui);
         GameDisplay display = new GameDisplay();
-        provider.addRequestHandler(display);
+        ScreenFactory screenFactory = createScreenFactory(gui);
+        ScreenCoordinator coordinator = new ScreenCoordinator(
+                screenFactory,
+                display,
+                new SettingsScreenStateStore(App.getSettings()));
         GameLoop gameLoop = new GameLoop(display, new GwtFrameScheduler(), fps);
-        engine = new Engine(gameLoop, display);
+        engine = new Engine(gameLoop, display, coordinator);
         engine.addChangeScreenHandler(gui);
-        provider.changeScreen(App.getSettings().getStartId());
+        coordinator.changeScreen(App.getSettings().getStartId());
     }
 
     protected abstract Settings createSettings();
@@ -56,7 +59,7 @@ public abstract class GameBuilder {
     protected abstract List<TextResource> getCssResources();
 
 
-    public abstract ScreenProvider ceateScreenProvider(HasContent parent);
+    public abstract ScreenFactory createScreenFactory(HasContent parent);
 
     public abstract GameGUI createGui(DialogManager dialogManager);
 

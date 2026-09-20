@@ -17,8 +17,7 @@ class TestScreen {
 
 			@Override
 			public void onFailure(Throwable reason) {
-				// TODO Auto-generated method stub
-
+				parent.onScreenCreationFailed(reason);
 			}
 		});
 	}
