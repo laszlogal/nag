@@ -8,6 +8,116 @@ plugins {
 def devModule = 'hu.norbisquest.nq1.NQ1'
 def generatedSassDir = layout.buildDirectory.dir('generated/gwt-sass')
 def generatedSassPackage = 'hu/norbisquest/nq1/client/data/css'
+def assetsRepository = providers.gradleProperty('nq1AssetsRepository')
+        .orElse('https://github.com/laszlogal/nq1-assets.git')
+def assetsVersion = providers.gradleProperty('nq1AssetsVersion')
+        .orElse('assets-v1.0.0')
+def assetsRevision = providers.gradleProperty('nq1AssetsRevision')
+        .orElse('e2add122e2bfb1856fa1921d2aef1c953b28904e')
+def assetsDirectory = providers.gradleProperty('nq1AssetsDirectory')
+        .map { rootProject.file(it) }
+        .getOrElse(file('src/main/java/hu/norbisquest/nq1/resources'))
+
+def runCommand = { File workingDirectory, List<String> command ->
+    def execution = providers.exec {
+        workingDir workingDirectory
+        commandLine command
+        ignoreExitValue = true
+    }
+    def result = execution.result.get()
+    if (result.exitValue != 0) {
+        def details = execution.standardError.asText.get().trim()
+        throw new GradleException("Command failed: ${command.join(' ')}" +
+                (details ? "\n${details}" : ''))
+    }
+    return execution.standardOutput.asText.get().trim()
+}
+
+def normalizedRepositoryUrl = { String url ->
+    url.trim().replaceFirst('/+$', '').replaceFirst('\\.git$', '')
+}
+
+def verifyAssetCheckout = {
+    if (!new File(assetsDirectory, '.git').isDirectory()) {
+        throw new GradleException("Private NQ1 assets are missing. Run ./gradlew :nq1:fetchAssets")
+    }
+
+    def currentRevision = runCommand(assetsDirectory, ['git', 'rev-parse', 'HEAD'])
+    if (currentRevision != assetsRevision.get()) {
+        throw new GradleException("NQ1 assets are at ${currentRevision}, but ${assetsRevision.get()} is required. " +
+                'Run ./gradlew :nq1:fetchAssets')
+    }
+
+    ['images/stages/S01_room.png', 'music/music1.mp3', 'speech/N1.mp3'].each { path ->
+        def asset = new File(assetsDirectory, path)
+        if (!asset.isFile()) {
+            throw new GradleException("Required NQ1 asset is missing: ${path}. " +
+                    'Run ./gradlew :nq1:fetchAssets')
+        }
+        byte[] prefix = new byte[42]
+        int bytesRead = asset.withInputStream { stream -> stream.read(prefix) }
+        def header = new String(prefix, 0, Math.max(bytesRead, 0), java.nio.charset.StandardCharsets.US_ASCII)
+        if (header.startsWith('version https://git-lfs.github.com/spec')) {
+            throw new GradleException("NQ1 asset contains an unresolved Git LFS pointer: ${path}. " +
+                    'Run ./gradlew :nq1:fetchAssets')
+        }
+    }
+}
+
+tasks.register('fetchAssets') {
+    group = 'assets'
+    description = "Fetches private NQ1 assets at ${assetsVersion.get()}."
+
+    doLast {
+        runCommand(projectDir, ['git', 'lfs', 'version'])
+
+        def gitDirectory = new File(assetsDirectory, '.git')
+        if (!gitDirectory.isDirectory()) {
+            if (assetsDirectory.exists() && assetsDirectory.listFiles()?.length) {
+                throw new GradleException("Cannot clone private assets because ${assetsDirectory} is not empty. " +
+                        'Move or remove it first; no files were changed.')
+            }
+            assetsDirectory.parentFile.mkdirs()
+            runCommand(projectDir, ['git', 'clone', '--branch', assetsVersion.get(), '--single-branch',
+                                    assetsRepository.get(), assetsDirectory.absolutePath])
+        }
+
+        def actualRepository = runCommand(assetsDirectory, ['git', 'remote', 'get-url', 'origin'])
+        if (normalizedRepositoryUrl(actualRepository) != normalizedRepositoryUrl(assetsRepository.get())) {
+            throw new GradleException("Asset checkout has unexpected origin ${actualRepository}; " +
+                    "expected ${assetsRepository.get()}.")
+        }
+
+        def changes = runCommand(assetsDirectory, ['git', 'status', '--porcelain'])
+        if (changes) {
+            throw new GradleException('Private assets contain local changes. Commit or stash them before fetching.')
+        }
+
+        runCommand(assetsDirectory, ['git', 'fetch', '--prune', '--tags', 'origin'])
+        def taggedRevision = runCommand(assetsDirectory,
+                ['git', 'rev-parse', "${assetsVersion.get()}^{commit}"])
+        if (taggedRevision != assetsRevision.get()) {
+            throw new GradleException("Asset tag ${assetsVersion.get()} resolves to ${taggedRevision}, " +
+                    "but the public build pins ${assetsRevision.get()}.")
+        }
+
+        def currentRevision = runCommand(assetsDirectory, ['git', 'rev-parse', 'HEAD'])
+        if (currentRevision != assetsRevision.get()) {
+            runCommand(assetsDirectory, ['git', 'checkout', '--detach', assetsRevision.get()])
+        }
+        runCommand(assetsDirectory, ['git', 'lfs', 'pull', 'origin'])
+        verifyAssetCheckout()
+        logger.lifecycle("NQ1 assets are ready at ${assetsVersion.get()} (${assetsRevision.get().take(12)}).")
+    }
+}
+
+def verifyAssets = tasks.register('verifyAssets') {
+    group = 'verification'
+    description = 'Verifies that the pinned private NQ1 assets are available locally.'
+    doLast {
+        verifyAssetCheckout()
+    }
+}
 
 dependencies {
     implementation project(':nqcommon')
@@ -65,6 +175,7 @@ compileSass {
 
 tasks.named('gwtCompile') {
     dependsOn tasks.named('compileSass')
+    dependsOn verifyAssets
 }
 
 tasks.named('compileJava') {
@@ -73,8 +184,10 @@ tasks.named('compileJava') {
 
 tasks.named('gwtDevMode') {
     dependsOn tasks.named('compileSass')
+    dependsOn verifyAssets
 }
 
 tasks.named('gwtSuperDev') {
     dependsOn tasks.named('compileSass')
+    dependsOn verifyAssets
 }
