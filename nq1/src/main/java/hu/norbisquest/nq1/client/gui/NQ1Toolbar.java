@@ -111,8 +111,7 @@ public class NQ1Toolbar extends NQToolbar {
 			App.setMode(toggleChooser.isDown() ? GameModes.USE: GameModes.EXAMINE);
 		} else if (src == toggleInventory) {
 			showInventory();
-            boolean toggled = true;
-		} if (src == toggleItem) {
+		} else if (src == toggleItem) {
 			App.resetMode();
 		} else if (src == btnMenu) {
 			menu.toggleMenu();

@@ -107,12 +107,19 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 
 	@Override
 	public void onTouchEnd(TouchEndEvent event) {
-		JsArray<Touch> touches = event.getTargetTouches().length() == 0
-				? event.getChangedTouches() : event.getTargetTouches();
+		if (App.isBlocked()) {
+			return;
+		}
+
+		JsArray<Touch> touches = event.getChangedTouches();
+		if (touches.length() == 0) {
+			return;
+		}
 
 		Touch t = touches.get(0);
-
 		CanvasElement eventCanvas = getEventLayer().getCanvas().getCanvasElement();
-		event.stopPropagation();
+		int x = gui.toScaledX(t.getRelativeX(eventCanvas));
+		int y = gui.toScaledY(t.getRelativeY(eventCanvas));
+		onClick(x, y);
 	}
 }

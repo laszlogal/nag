@@ -8,6 +8,9 @@ plugins {
 def devModule = 'hu.norbisquest.nq1.NQ1'
 def generatedSassDir = layout.buildDirectory.dir('generated/gwt-sass')
 def generatedSassPackage = 'hu/norbisquest/nq1/client/data/css'
+def compiledGwtWar = layout.buildDirectory.dir('gwt/war')
+def sourceWar = layout.projectDirectory.dir('war')
+def deployDirectory = providers.gradleProperty('nq1DeployDirectory')
 def assetsRepository = providers.gradleProperty('nq1AssetsRepository')
         .orElse('https://github.com/laszlogal/nq1-assets.git')
 def assetsVersion = providers.gradleProperty('nq1AssetsVersion')
@@ -190,4 +193,56 @@ tasks.named('gwtDevMode') {
 tasks.named('gwtSuperDev') {
     dependsOn tasks.named('compileSass')
     dependsOn verifyAssets
+}
+
+tasks.register('copyGwtToWar', Copy) {
+    group = 'deployment'
+    description = 'Copies the gwtCompile output into nq1/war.'
+    dependsOn tasks.named('gwtCompile')
+
+    from(compiledGwtWar)
+    into(sourceWar)
+}
+
+tasks.register('deployGwt') {
+    group = 'deployment'
+    description = 'Compiles and copies the web application directly to -Pnq1DeployDirectory.'
+    dependsOn tasks.named('gwtCompile')
+
+    doLast {
+        if (!deployDirectory.isPresent()) {
+            throw new GradleException('Missing deployment directory. Use ' +
+                    '-Pnq1DeployDirectory=/absolute/path/to/the/web-app-root')
+        }
+
+        String configuredPath = deployDirectory.get()
+        File configuredDestination = new File(configuredPath)
+        if (!configuredDestination.isAbsolute()) {
+            throw new GradleException('nq1DeployDirectory must be an absolute path: ' + configuredPath)
+        }
+
+        File destination = configuredDestination.canonicalFile
+        File filesystemRoot = destination.toPath().root.toFile().canonicalFile
+        File userHome = new File(System.getProperty('user.home')).canonicalFile
+        File projectRoot = rootProject.projectDir.canonicalFile
+
+        if (!destination.isDirectory()) {
+            throw new GradleException('nq1DeployDirectory must be an existing directory: ' + destination)
+        }
+        if (destination == filesystemRoot || destination == userHome || destination == projectRoot) {
+            throw new GradleException('Refusing unsafe deployment directory: ' + destination)
+        }
+
+        copy {
+            from(sourceWar) {
+                exclude '.DS_Store'
+                exclude 'nq1/**'
+                exclude 'WEB-INF/deploy/**'
+            }
+            from(compiledGwtWar)
+            into(destination)
+        }
+
+        logger.lifecycle('NQ1 deployed directly to ' + destination)
+    }
 }

@@ -105,9 +105,6 @@ public class Browser {
 
     public static native boolean isAndroid() /*-{
         var navString = navigator.userAgent.toLowerCase();
-        if (navString.indexOf("android") < 0) {
-            return true;
-        }
-        return true;
+        return navString.indexOf("android") >= 0;
     }-*/;
 }

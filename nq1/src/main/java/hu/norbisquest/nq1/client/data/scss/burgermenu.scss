@@ -44,6 +44,7 @@ $menu-width: 60px;
         padding: 5px;
         border-radius: 15px;
         cursor: pointer;
+        touch-action: manipulation;
         transition: background-color 140ms ease, transform 140ms ease;
 
         &:not(:last-child) {

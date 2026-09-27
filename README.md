@@ -30,3 +30,38 @@ GWT compilation and development-mode tasks run this local verification automatic
 ```shell
 ./gradlew :nq1:gwtCompile
 ```
+
+## Deploying the GWT output
+
+To copy the generated output from `nq1/build/gwt/war` into the checked-out
+`nq1/war` directory:
+
+```shell
+./gradlew :nq1:copyGwtToWar
+```
+
+To compile and copy the application directly into an existing web-server
+application root, without creating an archive or another staging directory:
+
+```shell
+./gradlew :nq1:deployGwt -Pnq1DeployDirectory=/absolute/path/to/webroot
+```
+
+The direct deployment combines the static files from `nq1/war` with the fresh
+GWT module output from `nq1/build/gwt/war`. It does not copy the generated output
+back through `nq1/war` first. To keep the machine-specific destination out of the
+repository, put the following in `~/.gradle/gradle.properties`:
+
+```properties
+nq1DeployDirectory=/absolute/path/to/webroot
+```
+
+Then deployment only requires:
+
+```shell
+./gradlew :nq1:deployGwt
+```
+
+The destination must already exist and must be dedicated to this web application.
+Deployment copies files in place and deliberately does not delete unrelated or
+older files from the destination.

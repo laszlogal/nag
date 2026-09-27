@@ -36,12 +36,15 @@
         float: none;
         outline: none;
         cursor: pointer;
+        touch-action: manipulation;
         transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
 
-        &:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(145deg, rgba(47, 55, 70, 0.96), rgba(17, 22, 31, 0.92));
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.36);
+        @media (hover: hover) and (pointer: fine) {
+            &:hover {
+                transform: translateY(-2px);
+                background: linear-gradient(145deg, rgba(47, 55, 70, 0.96), rgba(17, 22, 31, 0.92));
+                box-shadow: 0 14px 30px rgba(0, 0, 0, 0.36);
+            }
         }
 
         &:active {
