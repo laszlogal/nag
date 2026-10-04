@@ -7,16 +7,18 @@ import hu.norbisquest.nagbase.game.engine.ScreenCreationCallback;
 import hu.norbisquest.nagbase.game.engine.ScreenCreator;
 import hu.norbisquest.nagbase.game.engine.ScreenFactory;
 import hu.norbisquest.nagbase.game.engine.StagedScreenParent;
+import hu.norbisquest.nq1.client.game.screens.*;
 
 import java.util.EnumMap;
 import java.util.Map;
 
+
 /** The single registry for every screen that can currently be created by NQ1. */
-public final class NQ1StageFactory implements ScreenFactory {
+public final class NQ1ScreenFactory implements ScreenFactory {
     private final FlowPanel activeParent;
     private final Map<NQ1Ids, ScreenCreator> creators = new EnumMap<>(NQ1Ids.class);
 
-    public NQ1StageFactory(HasContent content) {
+    public NQ1ScreenFactory(HasContent content) {
         if (content == null || content.getContent() == null) {
             throw new IllegalArgumentException("content must not be null");
         }
@@ -25,6 +27,13 @@ public final class NQ1StageFactory implements ScreenFactory {
     }
 
     private void registerScreens() {
+        creators.put(NQ1Ids.MainMenu, MainMenu::create);
+        creators.put(NQ1Ids.Splash1, Splash1::create);
+        creators.put(NQ1Ids.Splash2, Splash2::create);
+        creators.put(NQ1Ids.Splash3, Splash3::create);
+        creators.put(NQ1Ids.PoorNorbi, PoorNorbi::create);
+        creators.put(NQ1Ids.Setup, Setup::create);
+        creators.put(NQ1Ids.Exit, Exit::create);
         creators.put(NQ1Ids.TestRoom, TestRoom::create);
         creators.put(NQ1Ids.TestScreen, TestScreen::create);
         creators.put(NQ1Ids.Room, Room::create);

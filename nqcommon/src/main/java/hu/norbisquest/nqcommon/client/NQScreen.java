@@ -15,6 +15,7 @@ import hu.norbisquest.nagbase.game.engine.ScreenParent;
 public abstract class NQScreen extends Screen implements EventLayerListener {
 	private int fadeTimer = 50;
 	private Id fadeTo = null;
+	private boolean transitionRequested;
 
 	protected NQScreen(int left, int top, int width, int height,
 					   ScreenParent parent) {
@@ -31,13 +32,14 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 
 	@Override
 	public void execute(double timestamp) {
-		if (fadeTo == null) {
+		if (fadeTo == null || transitionRequested) {
 			return;
 		}
 
 		fadeTimer--;
 
 		if (fadeTimer < 0) {
+			transitionRequested = true;
 			onFadeOut();
 		}
 	}
@@ -51,15 +53,9 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 	}
 
 	@Override
-	public boolean unload() {
-		App.setRootStyle("fade-out");
-		return super.unload();
-	}
-
-	@Override
-	public boolean load() {
+	protected void onAvailable(boolean isFirst) {
+		super.onAvailable(isFirst);
 		App.setRootStyle("fade-in");
-		return super.load();
 	}
 
 	@Override
@@ -87,6 +83,9 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 	}
 
 	protected void setFadeTo(Id fadeToId) {
+		if (transitionRequested) {
+			return;
+		}
 		this.fadeTo = fadeToId;
 		App.setRootStyle("fade-out-slow");
 	}

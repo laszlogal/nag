@@ -70,7 +70,6 @@ public class Splash extends Screen implements EventLayerListener {
 
 	@Override
 	public void doDestroy() {
-		App.setRootStyle("fade-out");
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import hu.norbisquest.nq1.client.factory.NQ1Ids;
 
 public class NQ1Settings extends Settings {
 	// Global int comments: original Adventure Game Studio reference
-	private static final NQ1Ids startScreen = NQ1Ids.Room;
+	private static final NQ1Ids startScreen = NQ1Ids.Splash1;
 	private static final int SCREEN_WIDTH = 640;
 	private static final int SCREEN_HEIGHT = 400;
 	public static final int FEE_PRICE = 2000;
@@ -270,7 +270,7 @@ public class NQ1Settings extends Settings {
 		return stealCount;
 	}
 
-	public void 	hoboStolen() {
+	public void hoboStolen() {
 		stealCount++;
 	}
 

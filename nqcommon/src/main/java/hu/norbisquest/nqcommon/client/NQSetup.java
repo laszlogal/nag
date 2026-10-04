@@ -1,7 +1,6 @@
 package hu.norbisquest.nqcommon.client;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-
 import hu.norbisquest.nagbase.core.layer.ImageLayer;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Settings.SpeechMode;
@@ -18,8 +17,6 @@ public abstract class NQSetup extends NQScreen {
 		super(App.LEFT, App.TOP, App.WIDTH, App.HEIGHT, parent);
 		setBackground(bgLayer);
 		setEventListener(this);
-		App.getCursor().normal();
-		createTargets();
 
 	}
 
@@ -47,6 +44,10 @@ public abstract class NQSetup extends NQScreen {
 
 	@Override
 	protected void onAvailable(boolean isFirst) {
+		App.getCursor().normal();
+		if (trgBack == null) {
+			createTargets();
+		}
 		setTargets();
 		super.onAvailable(isFirst);
 	}

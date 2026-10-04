@@ -1,20 +1,24 @@
 package hu.norbisquest.nq1.client.game.screens;
 
+import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.RootPanel;
 import hu.norbisquest.nagbase.core.layer.ImageLayer;
 import hu.norbisquest.nagbase.core.layer.Layer;
-import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Settings.SpeechMode;
+import hu.norbisquest.nagbase.game.engine.ScreenParent;
 import hu.norbisquest.nagbase.game.target.SimpleTarget;
 import hu.norbisquest.nq1.client.data.bundle.Common;
 import hu.norbisquest.nq1.client.factory.NQ1Ids;
 import hu.norbisquest.nqcommon.client.NQSetup;
 
-class Setup extends NQSetup {
+public final class Setup extends NQSetup {
+	private final FlowPanel controlsParent;
+	public static void create(ScreenParent parent) {
+		parent.onScreenCreated(new Setup(parent.getPanel()));
+	}
 	private class ImageTarget extends SimpleTarget {
 		private Image img;
 		private boolean valid;
@@ -22,6 +26,9 @@ class Setup extends NQSetup {
 		ImageTarget(final int left, final int top, ImageResource res) {
 			super("", left, top, 0, 0);
 			img = new Image(res);
+			img.setVisible(false);
+			img.getElement().getStyle().setPosition(Position.ABSOLUTE);
+			img.getElement().getStyle().setZIndex(Layer.Z_BACKGROUND + 1);
 			img.addLoadHandler(event -> {
                 valid = true;
                 img.addStyleName("imageTarget");
@@ -32,11 +39,11 @@ class Setup extends NQSetup {
 
             });
 
-			RootPanel.get("gui").add(img);
+			controlsParent.add(img);
 		}
 
 		void remove() {
-			RootPanel.get("gui").remove(img);
+			img.removeFromParent();
 		}
 
 		public boolean isValid() {
@@ -53,9 +60,11 @@ class Setup extends NQSetup {
 
 	}
 
-	Setup(FlowPanel parent) {
+	private Setup(FlowPanel parent) {
 		super(parent, new ImageLayer(Common.INSTANCE.setup(),
 				Layer.Z_BACKGROUND));
+		setId(NQ1Ids.Setup);
+		controlsParent = parent;
 		setMainMenuId(NQ1Ids.MainMenu);
 	}
 
@@ -94,10 +103,14 @@ class Setup extends NQSetup {
 	}
 
 	@Override
-	protected void onFadeOut() {
-		SimpleTarget t = getAudioTarget(App.getSettings().getSpeechMode());
-		((ImageTarget) t).remove();
-		super.onFadeOut();
+	protected void doDestroy() {
+		for (SpeechMode mode : SpeechMode.values()) {
+			SimpleTarget target = getAudioTarget(mode);
+			if (target instanceof ImageTarget) {
+				((ImageTarget) target).remove();
+			}
+		}
+		super.doDestroy();
 	}
 
 	@Override
