@@ -18,7 +18,6 @@ public abstract class NQDialogManager extends AbstractDialogManager {
 
 	protected NQDialogManager(SettingsChanged listener) {
 		this.setListener(listener);
-		inventory = createInventoryDialog();
 	}
 
 	@Override
@@ -59,6 +58,10 @@ public abstract class NQDialogManager extends AbstractDialogManager {
 
 	@Override
 	public void showInventoryDialog() {
+		if (inventory == null) {
+			inventory = createInventoryDialog();
+		}
+
 		if (inventory.isShowing()) {
 			inventory.hide();
 			popups.remove(inventory);

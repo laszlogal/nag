@@ -3,6 +3,7 @@ package hu.norbisquest.nagbase.game.engine;
 import hu.norbisquest.nagbase.common.engine.GameScreen;
 import hu.norbisquest.nagbase.common.engine.ScreenListener;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
+import hu.norbisquest.nagbase.core.ResourceScope;
 import hu.norbisquest.nagbase.game.Stage;
 import org.junit.Test;
 
@@ -33,6 +34,7 @@ public class ScreenCoordinatorTest {
         assertEquals(1, next.loadCount);
         assertSame(coordinator, next.listener);
         assertTrue(candidate.activated);
+        assertNull(candidate.getHandle());
         assertTrue(candidate.clearCurrentContent);
         assertEquals(1, stateStore.commits.size());
         assertEquals(TestId.ROOM, stateStore.commits.get(0).referer);
@@ -99,6 +101,53 @@ public class ScreenCoordinatorTest {
         assertEquals(0, previous.destroyCount);
         assertEquals(1, rejected.destroyCount);
         assertTrue(candidate.discarded);
+        assertEquals(0, stateStore.commits.size());
+        assertEquals(1, host.failures.size());
+    }
+
+    @Test
+    public void activationFailureDestroysCandidateAndPreservesCurrentScreen() {
+        ManualScreenFactory factory = new ManualScreenFactory();
+        RecordingHost host = new RecordingHost();
+        RecordingStateStore stateStore = new RecordingStateStore();
+        FakeScreen previous = new FakeScreen(TestId.ROOM);
+        FakeScreen rejected = new FakeScreen(TestId.CORRIDOR);
+        FakeCandidate candidate = new FakeCandidate(rejected);
+        candidate.activationFailure = new RuntimeException("activation failed");
+        host.screen = previous;
+        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
+
+        coordinator.changeScreen(TestId.CORRIDOR);
+        factory.succeed(0, candidate);
+
+        assertSame(previous, host.screen);
+        assertEquals(0, previous.destroyCount);
+        assertEquals(1, rejected.destroyCount);
+        assertTrue(candidate.discarded);
+        assertEquals(0, stateStore.commits.size());
+        assertEquals(1, host.failures.size());
+    }
+
+    @Test
+    public void hostRejectionDestroysTransferredHandle() {
+        ManualScreenFactory factory = new ManualScreenFactory();
+        RecordingHost host = new RecordingHost();
+        RecordingStateStore stateStore = new RecordingStateStore();
+        FakeScreen previous = new FakeScreen(TestId.ROOM);
+        FakeScreen rejected = new FakeScreen(TestId.CORRIDOR);
+        FakeCandidate candidate = new FakeCandidate(rejected);
+        host.screen = previous;
+        host.replaceFailure = new RuntimeException("host rejected screen");
+        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
+
+        coordinator.changeScreen(TestId.CORRIDOR);
+        factory.succeed(0, candidate);
+
+        assertSame(previous, host.screen);
+        assertEquals(0, previous.destroyCount);
+        assertEquals(1, rejected.destroyCount);
+        assertTrue(candidate.discarded);
+        assertNull(candidate.getHandle());
         assertEquals(0, stateStore.commits.size());
         assertEquals(1, host.failures.size());
     }
@@ -203,21 +252,39 @@ public class ScreenCoordinatorTest {
 
     private static final class FakeCandidate implements ScreenCandidate {
         private final FakeScreen screen;
+        private ScreenHandle handle;
         private boolean activated;
         private boolean discarded;
         private boolean clearCurrentContent;
+        private RuntimeException activationFailure;
 
         private FakeCandidate(FakeScreen screen) {
             this.screen = screen;
+            ResourceScope scope = new ResourceScope();
+            scope.register(screen);
+            handle = new ScreenHandle(screen, scope);
         }
 
         @Override
-        public GameScreen getScreen() {
-            return screen;
+        public ScreenHandle getHandle() {
+            return handle;
+        }
+
+        @Override
+        public ScreenHandle takeHandle() {
+            if (handle == null) {
+                throw new IllegalStateException("Candidate no longer owns a handle");
+            }
+            ScreenHandle transferred = handle;
+            handle = null;
+            return transferred;
         }
 
         @Override
         public void activate(boolean clearCurrentContent) {
+            if (activationFailure != null) {
+                throw activationFailure;
+            }
             activated = true;
             this.clearCurrentContent = clearCurrentContent;
         }
@@ -225,11 +292,18 @@ public class ScreenCoordinatorTest {
         @Override
         public void discard() {
             discarded = true;
+            ScreenHandle abandoned = handle;
+            handle = null;
+            if (abandoned != null) {
+                abandoned.destroy();
+            }
         }
     }
 
     private static final class RecordingHost implements ScreenHost {
         private GameScreen screen;
+        private ScreenHandle handle;
+        private RuntimeException replaceFailure;
         private final List<Throwable> failures = new ArrayList<>();
 
         @Override
@@ -238,11 +312,17 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public void replaceScreen(GameScreen next) {
-            if (screen != null) {
+        public void replaceScreen(ScreenHandle next) {
+            if (replaceFailure != null) {
+                throw replaceFailure;
+            }
+            if (handle != null) {
+                handle.destroy();
+            } else if (screen != null) {
                 screen.destroy();
             }
-            screen = next;
+            handle = next;
+            screen = next.getScreen();
         }
 
         @Override

@@ -44,7 +44,7 @@ public final class ScreenCoordinator implements ScreenListener {
         // Every request invalidates earlier asynchronous work, including a rejected request.
         final long requestGeneration = ++generation;
         if (id == null) {
-            failCurrentRequest(id, new IllegalArgumentException("Screen id must not be null"));
+            failCurrentRequest(null, new IllegalArgumentException("Screen id must not be null"));
             return;
         }
 
@@ -93,7 +93,8 @@ public final class ScreenCoordinator implements ScreenListener {
             discard(candidate);
             return;
         }
-        if (candidate == null || candidate.getScreen() == null) {
+
+        if (candidate == null || candidate.getHandle() == null) {
             fail(requestGeneration, id,
                     new IllegalStateException("Screen factory returned an empty candidate"));
             if (candidate != null) {
@@ -101,11 +102,12 @@ public final class ScreenCoordinator implements ScreenListener {
             }
             return;
         }
-
-        GameScreen next = candidate.getScreen();
+        ScreenHandle next = candidate.getHandle();
+        GameScreen nextScreen = next.getScreen();
+        boolean transferred = false;
         try {
-            next.setListener(this);
-            if (!next.load()) {
+            nextScreen.setListener(this);
+            if (!nextScreen.load()) {
                 throw new IllegalStateException("Screen refused to load: " + id);
             }
 
@@ -113,13 +115,22 @@ public final class ScreenCoordinator implements ScreenListener {
             Stage.Id referer = previous == null ? null : previous.getId();
 
             candidate.activate(clear);
+            next = candidate.takeHandle();
+            transferred = true;
             host.replaceScreen(next);
             stateStore.commit(referer, id);
             state = State.ACTIVE;
         } catch (Throwable cause) {
-            if (host.getScreen() != next) {
-                destroy(next);
-                candidate.discard();
+            if (host.getScreen() != nextScreen) {
+                Throwable cleanupFailure = cleanupRejectedCandidate(
+                        candidate, transferred ? next : null);
+                if (cleanupFailure != null) {
+                    try {
+                        cause.addSuppressed(cleanupFailure);
+                    } catch (Throwable ignored) {
+                        // Reporting the original transition failure takes priority.
+                    }
+                }
             }
             fail(requestGeneration, id, cause);
         }
@@ -146,13 +157,33 @@ public final class ScreenCoordinator implements ScreenListener {
         if (candidate == null) {
             return;
         }
-        destroy(candidate.getScreen());
         candidate.discard();
     }
 
-    private void destroy(GameScreen screen) {
-        if (screen != null && !screen.isDestroyed()) {
-            screen.destroy();
+    private Throwable cleanupRejectedCandidate(ScreenCandidate candidate,
+                                                ScreenHandle transferredHandle) {
+        Throwable failure = null;
+        try {
+            candidate.discard();
+        } catch (Throwable cause) {
+            failure = cause;
         }
+
+        if (transferredHandle != null) {
+            try {
+                transferredHandle.destroy();
+            } catch (Throwable cause) {
+                if (failure == null) {
+                    failure = cause;
+                } else {
+                    try {
+                        failure.addSuppressed(cause);
+                    } catch (Throwable ignored) {
+                        // Cleanup must continue even if failure recording fails.
+                    }
+                }
+            }
+        }
+        return failure;
     }
 }

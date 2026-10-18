@@ -9,9 +9,9 @@ import java.util.List;
 
 public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
 
-    private GameScreen screen;
+    private ScreenHandle screenHandle;
     private boolean changed;
-    private List<ChangeScreen> changeHandlers = new ArrayList<>();
+    private final List<ChangeScreen> changeHandlers = new ArrayList<>();
 
     public GameDisplay() {
         changed = false;
@@ -24,52 +24,43 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     }
 
 
-    private void setScreen(GameScreen screen) {
-        this.screen = screen;
-        notifyScreenChanged(screen);
-        if (screen instanceof Stage) {
-            notifyStageChanged((Stage) screen);
-        }
-    }
-
     @Override
     public void update(double timestamp) {
         if (isScreenChanged()) {
-            screen.show();
+            currentScreen().show();
             changed = false;
         } else {
             executeScreen(timestamp);
         }
     }
 
-   private void executeScreen(double timestamp) {
+    private GameScreen currentScreen() {
+        return screenHandle != null ? screenHandle.getScreen() : null;
+    }
+
+    private void executeScreen(double timestamp) {
         if (isScreenValid()) {
-            screen.execute(timestamp);
+            currentScreen().execute(timestamp);
         }
     }
 
     @Override
     protected void doDestroy() {
-        if (screen != null) {
-            screen.destroy();
+        ScreenHandle current = screenHandle;
+        screenHandle = null;
+        changed = false;
+        if (current != null) {
+            current.destroy();
         }
-        screen = null;
-    }
-
-    private void destroyCurrentScreen() {
-        if (screen == null) {
-            return;
-        }
-        screen.destroy();
-        screen = null;
     }
 
     @Override
     public GameScreen getScreen() {
-        return screen;
+        return screenHandle != null ? screenHandle.getScreen() : null;
     }
 
     public Stage getStage() {
+        GameScreen screen = currentScreen();
         if (screen instanceof Stage) {
             return (Stage) screen;
 
@@ -78,6 +69,10 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     }
 
     private boolean isScreenValid() {
+        if (screenHandle == null) {
+            return false;
+        }
+        GameScreen screen = screenHandle.getScreen();
         return screen != null && screen.isValid();
     }
 
@@ -99,9 +94,27 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     }
 
     @Override
-    public void replaceScreen(GameScreen screen) {
-        destroyCurrentScreen();
-        setScreen(screen);
+    public void replaceScreen(ScreenHandle handle) {
+        if (handle == null) {
+            throw new IllegalArgumentException("Screen handle must not be null");
+        }
+        if (handle.isDestroyed()) {
+            throw new IllegalArgumentException("Screen handle is already destroyed");
+        }
+
+        ScreenHandle previous = screenHandle;
+        screenHandle = handle;
+        GameScreen screen = screenHandle.getScreen();
+        try {
+            notifyScreenChanged(screen);
+            if (screen instanceof Stage) {
+                notifyStageChanged((Stage) screen);
+            }
+        } finally {
+            if (previous != null) {
+                previous.destroy();
+            }
+        }
     }
 
     @Override

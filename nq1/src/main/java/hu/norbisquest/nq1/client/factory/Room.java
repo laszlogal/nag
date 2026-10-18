@@ -16,7 +16,7 @@ class Room {
 
 			@Override
 			public void createStage(StageFactory factory) {
-				parent.onScreenCreated(new S01Room(factory));
+                parent.onScreenCreated(new S01Room(factory));
 			}
 		});
 	}

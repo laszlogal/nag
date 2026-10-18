@@ -12,7 +12,7 @@ import hu.norbisquest.nagbase.game.gui.Scalable;
 public abstract class NAGPopupPanel extends PopupPanel implements CloseHandler<PopupPanel>, Destroyable {
 	private ImageResource background=null;
 	private boolean destroyed = false;
-	private Scalable scaler;
+	private final Scalable scaler;
 	protected NAGPopupPanel(Scalable scaler) {
 		super(false, false);
 		this.scaler = scaler;
@@ -84,6 +84,7 @@ public abstract class NAGPopupPanel extends PopupPanel implements CloseHandler<P
 		if (destroyed) {
 			return;
 		}
+		destroyed = true;
 		background = null;
 	}
 

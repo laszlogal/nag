@@ -6,7 +6,8 @@ import hu.norbisquest.nagbase.game.Stage;
 public interface ScreenHost {
     GameScreen getScreen();
 
-    void replaceScreen(GameScreen screen);
+    /** Takes ownership of {@code handle} when invoked. */
+    void replaceScreen(ScreenHandle handle);
 
     void onScreenCreationFailed(Stage.Id id, Throwable cause);
 }
