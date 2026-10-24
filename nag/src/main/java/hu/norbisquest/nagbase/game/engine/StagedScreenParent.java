@@ -11,7 +11,7 @@ public final class StagedScreenParent implements ScreenParent {
     private final FlowPanel activeParent;
     private final FlowPanel stagingParent;
     private final ScreenCreationCallback callback;
-    private final ResourceScope buildingScope = new ResourceScope();
+    private ResourceScope buildingScope = new ResourceScope();
     private boolean completed;
 
     public StagedScreenParent(FlowPanel activeParent, ScreenCreationCallback callback) {
@@ -30,7 +30,7 @@ public final class StagedScreenParent implements ScreenParent {
 
     @Override
     public <T extends Destroyable> T register(T resource) {
-        if (completed) {
+        if (completed || buildingScope == null) {
             throw new IllegalStateException("Screen construction is complete");
         }
 
@@ -57,9 +57,10 @@ public final class StagedScreenParent implements ScreenParent {
         }
 
         register(screen);
-        ScreenHandle handle = new ScreenHandle(screen, buildingScope);
+        ResourceScope screenScope = buildingScope;
+        buildingScope = null;
         completed = true;
-        callback.onSuccess(new Candidate(handle));
+        callback.onSuccess(new CreatedScreen(screen, screenScope));
     }
 
     @Override
@@ -72,8 +73,12 @@ public final class StagedScreenParent implements ScreenParent {
 
         Throwable failure = cause != null ? cause
                 : new IllegalStateException("Screen creation failed without a cause");
+        ResourceScope failedScope = buildingScope;
+        buildingScope = null;
         try {
-            buildingScope.destroy();
+            if (failedScope != null) {
+                failedScope.destroy();
+            }
         } catch (Throwable cleanupFailure) {
             try {
                 failure.addSuppressed(cleanupFailure);
@@ -84,32 +89,29 @@ public final class StagedScreenParent implements ScreenParent {
         callback.onFailure(failure);
     }
 
-    private final class Candidate implements ScreenCandidate {
-        private ScreenHandle handle;
+    private final class CreatedScreen implements StagedScreen {
+        private final GameScreen screen;
+        private final ResourceScope resources;
         private boolean activated;
+        private boolean destroyed;
 
-        private Candidate(ScreenHandle handle) {
-            this.handle = handle;
+        private CreatedScreen(GameScreen screen, ResourceScope resources) {
+            this.screen = screen;
+            this.resources = resources;
         }
 
         @Override
-        public ScreenHandle getHandle() {
-            return handle;
-        }
-
-        @Override
-        public ScreenHandle takeHandle() {
-            ensureOwned();
-            ScreenHandle h = handle;
-            handle = null;
-            return h;
+        public GameScreen getScreen() {
+            return screen;
         }
 
         @Override
         public void activate(boolean clearCurrentContent) {
-            ensureOwned();
+            if (destroyed) {
+                throw new IllegalStateException("Staged screen is destroyed");
+            }
             if (activated) {
-                throw new IllegalStateException("Screen candidate is already active");
+                throw new IllegalStateException("Staged screen is already active");
             }
             if (clearCurrentContent) {
                 activeParent.clear();
@@ -119,22 +121,20 @@ public final class StagedScreenParent implements ScreenParent {
         }
 
         @Override
-        public void discard() {
+        public void destroy() {
+            if (destroyed) {
+                return;
+            }
+            destroyed = true;
             stagingParent.removeFromParent();
             stagingParent.clear();
-            ScreenHandle tmp = handle;
-            handle = null;
-            if (tmp != null) {
-                tmp.destroy();
-            }
             activated = false;
+            resources.destroy();
         }
 
-        private void ensureOwned() {
-            if (handle == null) {
-                throw new IllegalStateException(
-                        "Screen candidate was already transferred or discarded");
-            }
+        @Override
+        public boolean isDestroyed() {
+            return destroyed;
         }
     }
 }

@@ -3,7 +3,6 @@ package hu.norbisquest.nagbase.game.engine;
 import hu.norbisquest.nagbase.common.engine.GameScreen;
 import hu.norbisquest.nagbase.common.engine.ScreenListener;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
-import hu.norbisquest.nagbase.core.ResourceScope;
 import hu.norbisquest.nagbase.game.Stage;
 import org.junit.Test;
 
@@ -15,212 +14,143 @@ import static org.junit.Assert.*;
 public class ScreenCoordinatorTest {
 
     @Test
-    public void successfulRequestCommitsAndDestroysPreviousScreenOnce() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        RecordingStateStore stateStore = new RecordingStateStore();
-        FakeScreen previous = new FakeScreen(TestId.ROOM);
-        FakeScreen next = new FakeScreen(TestId.CORRIDOR);
-        host.screen = previous;
-        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
+    public void successfulTransitionInstallsScreenAndCommitsState() {
+        Fixture fixture = new Fixture();
+        FakeStagedScreen previous = new FakeStagedScreen(TestId.ROOM);
+        FakeStagedScreen next = new FakeStagedScreen(TestId.CORRIDOR);
+        fixture.host.current = previous;
 
-        coordinator.changeScreen(TestId.CORRIDOR);
-        FakeCandidate candidate = new FakeCandidate(next);
-        factory.succeed(0, candidate);
+        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.factory.succeed(0, next);
 
-        assertEquals(ScreenCoordinator.State.ACTIVE, coordinator.getState());
-        assertSame(next, host.screen);
-        assertEquals(1, previous.destroyCount);
-        assertEquals(1, next.loadCount);
-        assertSame(coordinator, next.listener);
-        assertTrue(candidate.activated);
-        assertNull(candidate.getHandle());
-        assertTrue(candidate.clearCurrentContent);
-        assertEquals(1, stateStore.commits.size());
-        assertEquals(TestId.ROOM, stateStore.commits.get(0).referer);
-        assertEquals(TestId.CORRIDOR, stateStore.commits.get(0).current);
+        assertEquals(ScreenCoordinator.State.READY, fixture.coordinator.getState());
+        assertSame(next.screen, fixture.host.getScreen());
+        assertTrue(previous.isDestroyed());
+        assertEquals(1, next.screen.loadCount);
+        assertSame(fixture.coordinator, next.screen.listener);
+        assertTrue(next.activated);
+        assertTrue(next.clearCurrentContent);
+        assertEquals(1, fixture.stateStore.commits.size());
+        assertEquals(TestId.ROOM, fixture.stateStore.commits.get(0).referer);
+        assertEquals(TestId.CORRIDOR, fixture.stateStore.commits.get(0).current);
+        assertEquals(0, fixture.failures.causes.size());
     }
 
     @Test
-    public void failedRequestPreservesActiveScreenAndSettings() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        RecordingStateStore stateStore = new RecordingStateStore();
-        FakeScreen previous = new FakeScreen(TestId.ROOM);
-        host.screen = previous;
-        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
+    public void factoryFailureIsTerminal() {
+        Fixture fixture = new Fixture();
+        RuntimeException failure = new RuntimeException("chunk failed");
 
-        coordinator.changeScreen(TestId.CORRIDOR);
-        factory.fail(0, new RuntimeException("chunk failed"));
+        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.factory.fail(0, failure);
 
-        assertEquals(ScreenCoordinator.State.ACTIVE, coordinator.getState());
-        assertSame(previous, host.screen);
-        assertEquals(0, previous.destroyCount);
-        assertEquals(0, stateStore.commits.size());
-        assertEquals(1, host.failures.size());
+        assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
+        assertSame(failure, fixture.failures.causes.get(0));
+        assertEquals(TestId.CORRIDOR, fixture.failures.ids.get(0));
+        assertEquals(0, fixture.stateStore.commits.size());
     }
 
     @Test
-    public void newestRequestWinsAndLateScreenIsDiscarded() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        RecordingStateStore stateStore = new RecordingStateStore();
-        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
-        FakeScreen late = new FakeScreen(TestId.ROOM);
-        FakeScreen newest = new FakeScreen(TestId.CORRIDOR);
-        FakeCandidate lateCandidate = new FakeCandidate(late);
+    public void rejectedLoadDestroysStagedScreenAndFailsFatally() {
+        Fixture fixture = new Fixture();
+        FakeStagedScreen rejected = new FakeStagedScreen(TestId.CORRIDOR);
+        rejected.screen.loadResult = false;
 
-        coordinator.changeScreen(TestId.ROOM);
-        coordinator.changeScreen(TestId.CORRIDOR);
-        factory.succeed(1, new FakeCandidate(newest));
-        factory.succeed(0, lateCandidate);
+        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.factory.succeed(0, rejected);
 
-        assertSame(newest, host.screen);
-        assertEquals(1, late.destroyCount);
-        assertTrue(lateCandidate.discarded);
-        assertEquals(1, stateStore.commits.size());
-        assertEquals(TestId.CORRIDOR, stateStore.commits.get(0).current);
+        assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
+        assertTrue(rejected.isDestroyed());
+        assertNull(fixture.host.getScreen());
+        assertEquals(1, fixture.failures.causes.size());
     }
 
     @Test
-    public void rejectedLoadIsDestroyedAndDoesNotReplaceCurrentScreen() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        RecordingStateStore stateStore = new RecordingStateStore();
-        FakeScreen previous = new FakeScreen(TestId.ROOM);
-        FakeScreen rejected = new FakeScreen(TestId.CORRIDOR);
-        rejected.loadResult = false;
-        FakeCandidate candidate = new FakeCandidate(rejected);
-        host.screen = previous;
-        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
+    public void activationFailureDestroysStagedScreen() {
+        Fixture fixture = new Fixture();
+        FakeStagedScreen rejected = new FakeStagedScreen(TestId.CORRIDOR);
+        rejected.activationFailure = new RuntimeException("activation failed");
 
-        coordinator.changeScreen(TestId.CORRIDOR);
-        factory.succeed(0, candidate);
+        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.factory.succeed(0, rejected);
 
-        assertSame(previous, host.screen);
-        assertEquals(0, previous.destroyCount);
-        assertEquals(1, rejected.destroyCount);
-        assertTrue(candidate.discarded);
-        assertEquals(0, stateStore.commits.size());
-        assertEquals(1, host.failures.size());
+        assertTrue(rejected.isDestroyed());
+        assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
+        assertEquals(1, fixture.failures.causes.size());
     }
 
     @Test
-    public void activationFailureDestroysCandidateAndPreservesCurrentScreen() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        RecordingStateStore stateStore = new RecordingStateStore();
-        FakeScreen previous = new FakeScreen(TestId.ROOM);
-        FakeScreen rejected = new FakeScreen(TestId.CORRIDOR);
-        FakeCandidate candidate = new FakeCandidate(rejected);
-        candidate.activationFailure = new RuntimeException("activation failed");
-        host.screen = previous;
-        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
+    public void hostRejectionDestroysUninstalledScreen() {
+        Fixture fixture = new Fixture();
+        FakeStagedScreen rejected = new FakeStagedScreen(TestId.CORRIDOR);
+        fixture.host.replaceFailure = new RuntimeException("host rejected screen");
 
-        coordinator.changeScreen(TestId.CORRIDOR);
-        factory.succeed(0, candidate);
+        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.factory.succeed(0, rejected);
 
-        assertSame(previous, host.screen);
-        assertEquals(0, previous.destroyCount);
-        assertEquals(1, rejected.destroyCount);
-        assertTrue(candidate.discarded);
-        assertEquals(0, stateStore.commits.size());
-        assertEquals(1, host.failures.size());
+        assertTrue(rejected.isDestroyed());
+        assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
+        assertEquals(1, fixture.failures.causes.size());
     }
 
     @Test
-    public void hostRejectionDestroysTransferredHandle() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        RecordingStateStore stateStore = new RecordingStateStore();
-        FakeScreen previous = new FakeScreen(TestId.ROOM);
-        FakeScreen rejected = new FakeScreen(TestId.CORRIDOR);
-        FakeCandidate candidate = new FakeCandidate(rejected);
-        host.screen = previous;
-        host.replaceFailure = new RuntimeException("host rejected screen");
-        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
+    public void overlappingTransitionIsIgnoredAndOriginalCompletes() {
+        Fixture fixture = new Fixture();
+        FakeStagedScreen next = new FakeStagedScreen(TestId.ROOM);
 
-        coordinator.changeScreen(TestId.CORRIDOR);
-        factory.succeed(0, candidate);
+        fixture.coordinator.changeScreen(TestId.ROOM);
+        fixture.coordinator.changeScreen(TestId.CORRIDOR);
 
-        assertSame(previous, host.screen);
-        assertEquals(0, previous.destroyCount);
-        assertEquals(1, rejected.destroyCount);
-        assertTrue(candidate.discarded);
-        assertNull(candidate.getHandle());
-        assertEquals(0, stateStore.commits.size());
-        assertEquals(1, host.failures.size());
+        assertEquals(1, fixture.host.pauseCount);
+        assertEquals(1, fixture.factory.callbacks.size());
+        assertEquals(ScreenCoordinator.State.LOADING, fixture.coordinator.getState());
+        fixture.factory.succeed(0, next);
+
+        assertEquals(ScreenCoordinator.State.READY, fixture.coordinator.getState());
+        assertSame(next.screen, fixture.host.getScreen());
+        assertFalse(next.isDestroyed());
+        assertTrue(fixture.failures.causes.isEmpty());
+
+        fixture.factory.succeed(0, next);
+        assertFalse(next.isDestroyed());
+        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        assertEquals(2, fixture.factory.callbacks.size());
     }
 
     @Test
-    public void stopInvalidatesPendingResult() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        FakeCandidate candidate = new FakeCandidate(new FakeScreen(TestId.ROOM));
-        ScreenCoordinator coordinator = new ScreenCoordinator(
-                factory, host, new RecordingStateStore());
+    public void stopDestroysLateResultWithoutShowingFatalError() {
+        Fixture fixture = new Fixture();
+        FakeStagedScreen late = new FakeStagedScreen(TestId.ROOM);
 
-        coordinator.changeScreen(TestId.ROOM);
-        coordinator.stop();
-        factory.succeed(0, candidate);
+        fixture.coordinator.changeScreen(TestId.ROOM);
+        fixture.coordinator.stop();
+        fixture.factory.succeed(0, late);
 
-        assertEquals(ScreenCoordinator.State.STOPPED, coordinator.getState());
-        assertTrue(candidate.discarded);
-        assertEquals(1, candidate.screen.destroyCount);
-        assertSame(null, host.screen);
+        assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
+        assertTrue(late.isDestroyed());
+        assertEquals(0, fixture.failures.causes.size());
     }
 
     @Test
-    public void invalidRequestInvalidatesPendingResult() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        FakeCandidate pending = new FakeCandidate(new FakeScreen(TestId.ROOM));
-        ScreenCoordinator coordinator = new ScreenCoordinator(
-                factory, host, new RecordingStateStore());
+    public void clearFlagIsPassedToActivation() {
+        Fixture fixture = new Fixture();
+        FakeStagedScreen next = new FakeStagedScreen(TestId.ROOM);
 
-        coordinator.changeScreen(TestId.ROOM);
-        coordinator.changeScreen(null);
-        factory.succeed(0, pending);
+        fixture.coordinator.changeScreen(TestId.ROOM, false);
+        fixture.factory.succeed(0, next);
 
-        assertEquals(ScreenCoordinator.State.FAILED, coordinator.getState());
-        assertTrue(pending.discarded);
-        assertEquals(1, pending.screen.destroyCount);
-        assertEquals(1, host.failures.size());
-        assertSame(null, host.screen);
+        assertTrue(next.activated);
+        assertFalse(next.clearCurrentContent);
     }
 
-    @Test
-    public void duplicateSuccessCannotInstallSecondScreen() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        RecordingStateStore stateStore = new RecordingStateStore();
-        FakeScreen first = new FakeScreen(TestId.ROOM);
-        FakeCandidate duplicate = new FakeCandidate(new FakeScreen(TestId.CORRIDOR));
-        ScreenCoordinator coordinator = new ScreenCoordinator(factory, host, stateStore);
-
-        coordinator.changeScreen(TestId.ROOM);
-        factory.succeed(0, new FakeCandidate(first));
-        factory.succeed(0, duplicate);
-
-        assertSame(first, host.screen);
-        assertTrue(duplicate.discarded);
-        assertEquals(1, duplicate.screen.destroyCount);
-        assertEquals(1, stateStore.commits.size());
-    }
-
-    @Test
-    public void clearFlagIsPassedToCandidateActivation() {
-        ManualScreenFactory factory = new ManualScreenFactory();
-        RecordingHost host = new RecordingHost();
-        FakeCandidate candidate = new FakeCandidate(new FakeScreen(TestId.ROOM));
-        ScreenCoordinator coordinator = new ScreenCoordinator(
-                factory, host, new RecordingStateStore());
-
-        coordinator.changeScreen(TestId.ROOM, false);
-        factory.succeed(0, candidate);
-
-        assertTrue(candidate.activated);
-        assertFalse(candidate.clearCurrentContent);
+    private static final class Fixture {
+        private final ManualScreenFactory factory = new ManualScreenFactory();
+        private final RecordingHost host = new RecordingHost();
+        private final RecordingStateStore stateStore = new RecordingStateStore();
+        private final RecordingFatalErrorHandler failures =
+                new RecordingFatalErrorHandler();
+        private final ScreenCoordinator coordinator = new ScreenCoordinator(
+                factory, host, stateStore, failures);
     }
 
     private enum TestId implements Stage.Id {
@@ -241,43 +171,29 @@ public class ScreenCoordinatorTest {
             callbacks.add(callback);
         }
 
-        void succeed(int request, ScreenCandidate candidate) {
-            callbacks.get(request).onSuccess(candidate);
+        private void succeed(int request, StagedScreen screen) {
+            callbacks.get(request).onSuccess(screen);
         }
 
-        void fail(int request, Throwable cause) {
+        private void fail(int request, Throwable cause) {
             callbacks.get(request).onFailure(cause);
         }
     }
 
-    private static final class FakeCandidate implements ScreenCandidate {
+    private static final class FakeStagedScreen implements StagedScreen {
         private final FakeScreen screen;
-        private ScreenHandle handle;
         private boolean activated;
-        private boolean discarded;
+        private boolean destroyed;
         private boolean clearCurrentContent;
         private RuntimeException activationFailure;
 
-        private FakeCandidate(FakeScreen screen) {
-            this.screen = screen;
-            ResourceScope scope = new ResourceScope();
-            scope.register(screen);
-            handle = new ScreenHandle(screen, scope);
+        private FakeStagedScreen(Stage.Id id) {
+            screen = new FakeScreen(id);
         }
 
         @Override
-        public ScreenHandle getHandle() {
-            return handle;
-        }
-
-        @Override
-        public ScreenHandle takeHandle() {
-            if (handle == null) {
-                throw new IllegalStateException("Candidate no longer owns a handle");
-            }
-            ScreenHandle transferred = handle;
-            handle = null;
-            return transferred;
+        public GameScreen getScreen() {
+            return screen;
         }
 
         @Override
@@ -290,44 +206,45 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public void discard() {
-            discarded = true;
-            ScreenHandle abandoned = handle;
-            handle = null;
-            if (abandoned != null) {
-                abandoned.destroy();
+        public void destroy() {
+            if (destroyed) {
+                return;
             }
+            destroyed = true;
+            screen.destroy();
+        }
+
+        @Override
+        public boolean isDestroyed() {
+            return destroyed;
         }
     }
 
     private static final class RecordingHost implements ScreenHost {
-        private GameScreen screen;
-        private ScreenHandle handle;
+        private StagedScreen current;
         private RuntimeException replaceFailure;
-        private final List<Throwable> failures = new ArrayList<>();
+        private int pauseCount;
+
+        @Override
+        public void pauseScreen() {
+            pauseCount++;
+        }
 
         @Override
         public GameScreen getScreen() {
-            return screen;
+            return current == null ? null : current.getScreen();
         }
 
         @Override
-        public void replaceScreen(ScreenHandle next) {
+        public void replaceScreen(StagedScreen next) {
             if (replaceFailure != null) {
                 throw replaceFailure;
             }
-            if (handle != null) {
-                handle.destroy();
-            } else if (screen != null) {
-                screen.destroy();
+            StagedScreen previous = current;
+            current = next;
+            if (previous != null) {
+                previous.destroy();
             }
-            handle = next;
-            screen = next.getScreen();
-        }
-
-        @Override
-        public void onScreenCreationFailed(Stage.Id id, Throwable cause) {
-            failures.add(cause);
         }
     }
 
@@ -337,6 +254,18 @@ public class ScreenCoordinatorTest {
         @Override
         public void commit(Stage.Id referer, Stage.Id current) {
             commits.add(new Commit(referer, current));
+        }
+    }
+
+    private static final class RecordingFatalErrorHandler
+            implements FatalErrorHandler {
+        private final List<Stage.Id> ids = new ArrayList<>();
+        private final List<Throwable> causes = new ArrayList<>();
+
+        @Override
+        public void show(Stage.Id failedScreen, Throwable cause) {
+            ids.add(failedScreen);
+            causes.add(cause);
         }
     }
 
@@ -355,11 +284,14 @@ public class ScreenCoordinatorTest {
         private boolean destroyed;
         private boolean loadResult = true;
         private int loadCount;
-        private int destroyCount;
         private ScreenListener listener;
 
         private FakeScreen(Stage.Id id) {
             this.id = id;
+        }
+
+        @Override
+        public void setInputEnabled(boolean enabled) {
         }
 
         @Override
@@ -411,10 +343,7 @@ public class ScreenCoordinatorTest {
 
         @Override
         public void destroy() {
-            if (!destroyed) {
-                destroyed = true;
-                destroyCount++;
-            }
+            destroyed = true;
         }
 
         @Override

@@ -32,7 +32,9 @@ public class Engine implements GameEngine {
 
     @Override
     public void run() {
-        gameLoop.start();
+        if (screenCoordinator.getState() != ScreenCoordinator.State.STOPPED) {
+            gameLoop.start();
+        }
     }
 
     @Override

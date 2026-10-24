@@ -1,7 +1,7 @@
 package hu.norbisquest.nagbase.game.engine;
 
 public interface ScreenCreationCallback {
-    void onSuccess(ScreenCandidate candidate);
+    void onSuccess(StagedScreen screen);
 
     void onFailure(Throwable cause);
 }

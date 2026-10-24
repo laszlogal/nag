@@ -44,6 +44,13 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 
 
 	@Override
+	public void setInputEnabled(boolean enabled) {
+		if (eventLayer != null) {
+			eventLayer.setEnabled(enabled);
+		}
+	}
+
+	@Override
 	public void show() {
 		onAvailable(App.getSettings().isScreenVisited());
 		appear();

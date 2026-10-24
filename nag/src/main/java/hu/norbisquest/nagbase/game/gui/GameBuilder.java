@@ -33,11 +33,12 @@ public abstract class GameBuilder {
         gui = createGui(createDialogManager());
         GameDisplay display = new GameDisplay();
         ScreenFactory screenFactory = createScreenFactory(gui);
+        GameLoop gameLoop = new GameLoop(display, new GwtFrameScheduler(), fps);
         ScreenCoordinator coordinator = new ScreenCoordinator(
                 screenFactory,
                 display,
-                new SettingsScreenStateStore(App.getSettings()));
-        GameLoop gameLoop = new GameLoop(display, new GwtFrameScheduler(), fps);
+                new SettingsScreenStateStore(App.getSettings()),
+                new GwtFatalErrorHandler(gui.getContent(), gameLoop, display));
         engine = new Engine(gameLoop, display, coordinator);
         engine.addChangeScreenHandler(gui);
         coordinator.changeScreen(App.getSettings().getStartId());

@@ -1,13 +1,12 @@
 package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
-import hu.norbisquest.nagbase.game.Stage;
-
 public interface ScreenHost {
     GameScreen getScreen();
 
-    /** Takes ownership of {@code handle} when invoked. */
-    void replaceScreen(ScreenHandle handle);
+    /** Stops updates and input on the outgoing screen until replacement. */
+    void pauseScreen();
 
-    void onScreenCreationFailed(Stage.Id id, Throwable cause);
+    /** Takes ownership of {@code screen} when invoked. */
+    void replaceScreen(StagedScreen screen);
 }

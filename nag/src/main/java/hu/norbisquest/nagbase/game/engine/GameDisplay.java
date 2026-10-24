@@ -9,8 +9,9 @@ import java.util.List;
 
 public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
 
-    private ScreenHandle screenHandle;
+    private StagedScreen stagedScreen;
     private boolean changed;
+    private boolean paused;
     private final List<ChangeScreen> changeHandlers = new ArrayList<>();
 
     public GameDisplay() {
@@ -26,6 +27,9 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
 
     @Override
     public void update(double timestamp) {
+        if (paused) {
+            return;
+        }
         if (isScreenChanged()) {
             currentScreen().show();
             changed = false;
@@ -34,8 +38,17 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
         }
     }
 
+    @Override
+    public void pauseScreen() {
+        paused = true;
+        GameScreen screen = currentScreen();
+        if (screen != null) {
+            screen.setInputEnabled(false);
+        }
+    }
+
     private GameScreen currentScreen() {
-        return screenHandle != null ? screenHandle.getScreen() : null;
+        return stagedScreen != null ? stagedScreen.getScreen() : null;
     }
 
     private void executeScreen(double timestamp) {
@@ -46,8 +59,8 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
 
     @Override
     protected void doDestroy() {
-        ScreenHandle current = screenHandle;
-        screenHandle = null;
+        StagedScreen current = stagedScreen;
+        stagedScreen = null;
         changed = false;
         if (current != null) {
             current.destroy();
@@ -56,7 +69,7 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
 
     @Override
     public GameScreen getScreen() {
-        return screenHandle != null ? screenHandle.getScreen() : null;
+        return currentScreen();
     }
 
     public Stage getStage() {
@@ -69,10 +82,10 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     }
 
     private boolean isScreenValid() {
-        if (screenHandle == null) {
+        if (stagedScreen == null) {
             return false;
         }
-        GameScreen screen = screenHandle.getScreen();
+        GameScreen screen = stagedScreen.getScreen();
         return screen != null && screen.isValid();
     }
 
@@ -94,21 +107,22 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     }
 
     @Override
-    public void replaceScreen(ScreenHandle handle) {
-        if (handle == null) {
-            throw new IllegalArgumentException("Screen handle must not be null");
+    public void replaceScreen(StagedScreen screen) {
+        if (screen == null) {
+            throw new IllegalArgumentException("Staged screen must not be null");
         }
-        if (handle.isDestroyed()) {
-            throw new IllegalArgumentException("Screen handle is already destroyed");
+        if (screen.isDestroyed()) {
+            throw new IllegalArgumentException("Staged screen is already destroyed");
         }
 
-        ScreenHandle previous = screenHandle;
-        screenHandle = handle;
-        GameScreen screen = screenHandle.getScreen();
+        StagedScreen previous = stagedScreen;
+        stagedScreen = screen;
+        paused = false;
+        GameScreen gameScreen = screen.getScreen();
         try {
-            notifyScreenChanged(screen);
-            if (screen instanceof Stage) {
-                notifyStageChanged((Stage) screen);
+            notifyScreenChanged(gameScreen);
+            if (gameScreen instanceof Stage) {
+                notifyStageChanged((Stage) gameScreen);
             }
         } finally {
             if (previous != null) {
@@ -117,10 +131,4 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
         }
     }
 
-    @Override
-    public void onScreenCreationFailed(Stage.Id id, Throwable cause) {
-        String message = cause == null ? "unknown error" : cause.getMessage();
-        hu.norbisquest.nagbase.game.App.error(
-                "Failed to create screen " + id + ": " + message);
-    }
 }

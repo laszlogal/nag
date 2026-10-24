@@ -38,9 +38,9 @@ public class EventLayer extends Layer implements Loadable {
 		createLongPressTimer();
 		canvas.sinkEvents(Event.MOUSEEVENTS | Event.ONCLICK | Event.ONCONTEXTMENU | Event.TOUCHEVENTS);
 		canvas.addMouseMoveHandler(event -> {
-			// if (App.isBlocked() || !isEnabled()) {
-			// return;
-			// }
+			if (!isEnabled()) {
+				return;
+			}
 
 			x = event.getRelativeX(canvas.getElement());
 			y = event.getRelativeY(canvas.getElement());
@@ -50,9 +50,9 @@ public class EventLayer extends Layer implements Loadable {
 		});
 
 		canvas.addMouseOutHandler(event -> {
-			// if (App.isBlocked() || !isEnabled()) {
-			// return;
-			// }
+			if (!isEnabled()) {
+				return;
+			}
 			if (listener != null) {
 				listener.onMouseOut(zoomer.toScaledX(x), zoomer.toScaledY(y));
 			}
@@ -72,6 +72,9 @@ public class EventLayer extends Layer implements Loadable {
 		});
 
 		canvas.addMouseDownHandler(event -> {
+			if (App.isBlocked() || !isEnabled()) {
+				return;
+			}
 			longPressX = zoomer.toScaledX(event.getRelativeX(canvas.getElement()));
 			longPressY = zoomer.toScaledY(event.getRelativeY(canvas.getElement()));
 			longPressTimer.schedule(LONG_PRESS_TIME);
@@ -88,12 +91,18 @@ public class EventLayer extends Layer implements Loadable {
 		});
 
 		canvas.addHandler(event -> {
+			if (App.isBlocked() || !isEnabled()) {
+				return;
+			}
 			event.getNativeEvent().stopPropagation();
 			event.getNativeEvent().preventDefault();
 			listener.onContextMenu(event);
 		}, ContextMenuEvent.getType());
 
 		canvas.addTouchStartHandler(event -> {
+			if (App.isBlocked() || !isEnabled()) {
+				return;
+			}
 			event.stopPropagation();
 			event.preventDefault();
 			Touch t = event.getTargetTouches().get(0);
@@ -106,6 +115,9 @@ public class EventLayer extends Layer implements Loadable {
 		});
 
 		canvas.addTouchMoveHandler(event -> {
+			if (App.isBlocked() || !isEnabled()) {
+				return;
+			}
 			event.stopPropagation();
 			event.preventDefault();
 			App.debug("TOUCH MOVE");
@@ -114,6 +126,9 @@ public class EventLayer extends Layer implements Loadable {
 		});
 
 		canvas.addTouchEndHandler(event -> {
+			if (App.isBlocked() || !isEnabled()) {
+				return;
+			}
 			event.stopPropagation();
 			event.preventDefault();
 			App.debug("TOUCH END");
@@ -124,6 +139,9 @@ public class EventLayer extends Layer implements Loadable {
 		canvas.addDragOverHandler(DomEvent::preventDefault);
 
 		canvas.addDropHandler(event -> {
+			if (App.isBlocked() || !isEnabled()) {
+				return;
+			}
 			int x1 = zoomer.toScaledX(getRelativeX(event.getNativeEvent()));
 			int y1 = zoomer.toScaledY(getRelativeY(event.getNativeEvent()));
 			log("Drop (" + x1 + ", " + y1 + ")");
@@ -140,6 +158,9 @@ public class EventLayer extends Layer implements Loadable {
 
 			@Override
 			public void run() {
+				if (App.isBlocked() || !isEnabled()) {
+					return;
+				}
 				listener.onLongPress(longPressX, longPressY);
 			}
 		};
@@ -171,6 +192,9 @@ public class EventLayer extends Layer implements Loadable {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+		if (!enabled) {
+			longPressTimer.cancel();
+		}
 	}
 
 	@Override

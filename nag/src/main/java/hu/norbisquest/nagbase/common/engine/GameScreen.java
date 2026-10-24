@@ -10,6 +10,8 @@ public interface GameScreen extends Destroyable, Loadable {
 
     void show();
 
+    void setInputEnabled(boolean enabled);
+
     boolean isValid();
 
     Stage.Id getId();
