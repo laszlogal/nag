@@ -153,10 +153,6 @@ public class GameDisplayTest {
         }
 
         @Override
-        public void appear() {
-        }
-
-        @Override
         public void execute(double timestamp) {
             executeCount++;
         }

@@ -33,7 +33,7 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 
 	protected GameGUI gui;
 
-	public 	Screen(int left, int top, int width, int height, FlowPanel parent) {
+	public Screen(int left, int top, int width, int height, FlowPanel parent) {
 		super(left, top, width, height, parent);
 	}
 
@@ -53,8 +53,8 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 	@Override
 	public void show() {
 		onAvailable(App.getSettings().isScreenVisited());
-		appear();
 	}
+
 	/**
 	 * Defines a game screen on the Web Page.
 	 * 
@@ -228,7 +228,6 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 		this.id = id;
 	}
 
-	@Override
 	public ScreenListener getListener() {
 		return listener;
 	}
@@ -270,11 +269,6 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 	 */
 	public void setZBase(int zBase) {
 		this.zBase = zBase;
-	}
-
-	@Override
-	public void appear() {
-
 	}
 
 	public void reload() {

@@ -339,7 +339,12 @@ public abstract class NQStage extends Stage {
     }
 
 	@Override
-	public void appear() {
+	public void show() {
+		super.show();
+		fadeIn();
+	}
+
+	private void fadeIn() {
 		App.setRootStyle("fade-in");
 	}
 

@@ -2,26 +2,22 @@ package hu.norbisquest.nagbase.common.engine;
 
 import hu.norbisquest.nagbase.common.gui.GameGUI;
 import hu.norbisquest.nagbase.core.Destroyable;
-import hu.norbisquest.nagbase.core.Loadable;
 import hu.norbisquest.nagbase.game.Stage;
 
-public interface GameScreen extends Destroyable, Loadable {
-    void setGui(GameGUI gui);
-
-    void show();
-
-    void setInputEnabled(boolean enabled);
-
-    boolean isValid();
-
+public interface GameScreen extends Destroyable {
     Stage.Id getId();
 
-    ScreenListener getListener();
+    void setGui(GameGUI gui);
 
     void setListener(ScreenListener listener);
 
-    void appear();
+    boolean load();
+
+    boolean isValid();
+
+    void show();
 
     void execute(double timestamp);
 
+    void setInputEnabled(boolean enabled);
 }

@@ -313,32 +313,12 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public ScreenListener getListener() {
-            return listener;
-        }
-
-        @Override
         public void setListener(ScreenListener listener) {
             this.listener = listener;
         }
 
         @Override
-        public void appear() {
-        }
-
-        @Override
         public void execute(double timestamp) {
-        }
-
-        @Override
-        public boolean load() {
-            loadCount++;
-            return loadResult;
-        }
-
-        @Override
-        public boolean unload() {
-            return true;
         }
 
         @Override
