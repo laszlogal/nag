@@ -1,8 +1,7 @@
 package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
-import hu.norbisquest.nagbase.common.engine.ScreenListener;
-import hu.norbisquest.nagbase.common.gui.GameGUI;
+import hu.norbisquest.nagbase.common.engine.ScreenContext;
 import hu.norbisquest.nagbase.core.ResourceScope;
 import hu.norbisquest.nagbase.game.Stage;
 import org.junit.Test;
@@ -116,7 +115,7 @@ public class GameDisplayTest {
         private int showCount;
         private int executeCount;
         private boolean inputEnabled = true;
-        private ScreenListener listener;
+        private ScreenContext context;
 
         @Override
         public void setInputEnabled(boolean enabled) {
@@ -124,16 +123,17 @@ public class GameDisplayTest {
         }
 
         @Override
-        public void setGui(GameGUI gui) {
+        public void attach(ScreenContext context) {
+            this.context = context;
         }
 
         @Override
-        public void show() {
+        public void enter() {
             showCount++;
         }
 
         @Override
-        public boolean isValid() {
+        public boolean isReady() {
             return !destroyed;
         }
 
@@ -143,27 +143,12 @@ public class GameDisplayTest {
         }
 
         @Override
-        public ScreenListener getListener() {
-            return listener;
-        }
-
-        @Override
-        public void setListener(ScreenListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        public void execute(double timestamp) {
+        public void update(double timestamp) {
             executeCount++;
         }
 
         @Override
-        public boolean load() {
-            return true;
-        }
-
-        @Override
-        public boolean unload() {
+        public boolean prepare() {
             return true;
         }
 

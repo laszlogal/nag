@@ -226,7 +226,7 @@ public abstract class NQStage extends Stage {
 	protected abstract Hero getNorbi();
 
 	@Override
-	public boolean load() {
+	public boolean prepare() {
 		if (getResource() == null) {
 			App.warn("Stage Resources NOT set!!!");
 			return false;
@@ -339,8 +339,8 @@ public abstract class NQStage extends Stage {
     }
 
 	@Override
-	public void show() {
-		super.show();
+	public void enter() {
+		super.enter();
 		fadeIn();
 	}
 
@@ -350,7 +350,7 @@ public abstract class NQStage extends Stage {
 
 	@Override
 	public void onMouseMove(int x, int y) {
-		if (!isValid()) {
+		if (!this.isValid()) {
 			return;
 		}
 		selectHotSpotAt(x, y);
@@ -374,24 +374,24 @@ public abstract class NQStage extends Stage {
 
 	@Override
 	public void onTouchStart(TouchStartEvent event) {
-		gui.setJustZoomed(false);
+		getGui().setJustZoomed(false);
 		Touch t = event.getTargetTouches().get(0);
 		CanvasElement eventCanvas = getEventLayer().getCanvas().getCanvasElement();
-		int x = gui.toScaledX(t.getRelativeX(eventCanvas));
-		int y = gui.toScaledY(t.getRelativeY(eventCanvas));
+		int x = getGui().toScaledX(t.getRelativeX(eventCanvas));
+		int y = getGui().toScaledY(t.getRelativeY(eventCanvas));
 		selectHotSpotAt(x, y);
 	}
 
 	@Override
 	public void onTouchEnd(TouchEndEvent event) {
-		if (App.isBlocked() || gui.justZoomed()) {
+		if (App.isBlocked() || getGui().justZoomed()) {
 			return;
 		}
 		Touch t = event.getTargetTouches().length() == 0
 				? event.getChangedTouches().get(0) : event.getTargetTouches().get(0);
 		CanvasElement eventCanvas = getEventLayer().getCanvas().getCanvasElement();
-		int x = gui.toScaledX(t.getRelativeX(eventCanvas));
-		int y = gui.toScaledY(t.getRelativeY(eventCanvas));
+		int x = getGui().toScaledX(t.getRelativeX(eventCanvas));
+		int y = getGui().toScaledY(t.getRelativeY(eventCanvas));
 		onClick(x, y);
 	}
 
@@ -430,10 +430,10 @@ public abstract class NQStage extends Stage {
 	}
 
 	@Override
-	public void execute(double timestamp) {
-		super.execute(timestamp);
+	public void update(double timestamp) {
+		super.update(timestamp);
 
-		if (!isValid()) {
+		if (!this.isValid()) {
 			return;
 		}
 		update();
@@ -475,7 +475,7 @@ public abstract class NQStage extends Stage {
 	}
 
 	@Override
-	public boolean isValid() {
+	public boolean isReady() {
 		return super.isValid() && getForeground().isValid() && ((getResource().hotSpotMask == null) || getHotSpots().hasMask())
 				&& (getBackground() == null || getBackground().isLoaded());
 	}
@@ -504,7 +504,7 @@ public abstract class NQStage extends Stage {
 				toggleDebug();
 				break;
 			case KeyCodes.KEY_Q:
-				getListener().changeScreen(getId());
+				getListener().navigateTo(getId());
 				break;
 		case KeyCodes.KEY_H:
 			drawHotSpot = !drawHotSpot;

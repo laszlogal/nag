@@ -3,6 +3,7 @@ package hu.norbisquest.nagbase.game.engine;
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.user.client.ui.FlowPanel;
 import hu.norbisquest.nagbase.common.engine.GameScreen;
+import hu.norbisquest.nagbase.common.engine.ScreenContext;
 import hu.norbisquest.nagbase.core.Destroyable;
 import hu.norbisquest.nagbase.core.ResourceScope;
 
@@ -10,18 +11,24 @@ import hu.norbisquest.nagbase.core.ResourceScope;
 public final class StagedScreenParent implements ScreenParent {
     private final FlowPanel activeParent;
     private final FlowPanel stagingParent;
+    private final ScreenContext context;
     private final ScreenCreationCallback callback;
     private ResourceScope buildingScope = new ResourceScope();
     private boolean completed;
 
-    public StagedScreenParent(FlowPanel activeParent, ScreenCreationCallback callback) {
+    public StagedScreenParent(FlowPanel activeParent, ScreenContext context,
+                              ScreenCreationCallback callback) {
         if (activeParent == null) {
             throw new IllegalArgumentException("activeParent must not be null");
+        }
+        if (context == null) {
+            throw new IllegalArgumentException("context must not be null");
         }
         if (callback == null) {
             throw new IllegalArgumentException("callback must not be null");
         }
         this.activeParent = activeParent;
+        this.context = context;
         this.callback = callback;
         this.stagingParent = new FlowPanel();
         this.stagingParent.setSize("100%", "100%");
@@ -56,7 +63,13 @@ public final class StagedScreenParent implements ScreenParent {
             return;
         }
 
-        register(screen);
+        try {
+            register(screen);
+            screen.attach(context);
+        } catch (Throwable cause) {
+            onScreenCreationFailed(cause);
+            return;
+        }
         ResourceScope screenScope = buildingScope;
         buildingScope = null;
         completed = true;

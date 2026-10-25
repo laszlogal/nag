@@ -1,18 +1,18 @@
 package hu.norbisquest.nagbase.game;
 
-import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FlowPanel;
 import hu.norbisquest.nagbase.common.engine.GameScreen;
-import hu.norbisquest.nagbase.common.engine.ScreenListener;
+import hu.norbisquest.nagbase.common.engine.ScreenContext;
+import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
 import hu.norbisquest.nagbase.common.gui.ScreenDimension;
 import hu.norbisquest.nagbase.core.layer.*;
 import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nagbase.game.engine.ScreenParent;
 
-public abstract class Screen extends MultiLayer implements AnimationCallback, GameScreen {
+public abstract class Screen extends MultiLayer implements GameScreen {
 
 	/**
 	 * Default Layer Names Layers that usually needed in a game.
@@ -25,21 +25,25 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 
 	private static Layer debugLayer;
 
-	private ScreenListener listener;
+	private ScreenContext context;
 	private Id id;
 	private int zBase;
 
 	Screen(){}
-
-	protected GameGUI gui;
 
 	public Screen(int left, int top, int width, int height, FlowPanel parent) {
 		super(left, top, width, height, parent);
 	}
 
 	@Override
-	public void setGui(GameGUI gui) {
-		this.gui = gui;
+	public final void attach(ScreenContext context) {
+		if (context == null) {
+			throw new IllegalArgumentException("context must not be null");
+		}
+		if (this.context != null) {
+			throw new IllegalStateException("Screen context is already attached");
+		}
+		this.context = context;
 	}
 
 
@@ -51,7 +55,7 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 	}
 
 	@Override
-	public void show() {
+	public void enter() {
 		onAvailable(App.getSettings().isScreenVisited());
 	}
 
@@ -66,7 +70,6 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 		super(dimension.getLeft(), dimension.getTop(), dimension.getWidth(), dimension.getHeight(),
 				parent.getPanel());
 		eventLayer = null;
-		listener = null;
 		zBase = 0;
 	}
 
@@ -228,19 +231,19 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 		this.id = id;
 	}
 
-	public ScreenListener getListener() {
-		return listener;
+	public ScreenNavigation getListener() {
+		return requireContext().navigation();
 	}
 
-	/**
-	 * Sets the screen listener responsible for handling events
-	 * 
-	 * @param listener
-	 *            The object to handle events;
-	 */
-	@Override
-	public void setListener(ScreenListener listener) {
-		this.listener = listener;
+	protected final GameGUI getGui() {
+		return requireContext().gui();
+	}
+
+	private ScreenContext requireContext() {
+		if (context == null) {
+			throw new IllegalStateException("Screen context is not attached");
+		}
+		return context;
 	}
 
 	/**
@@ -252,7 +255,7 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 	 *            decides if the screen become available for the first time.
 	 */
     protected void onAvailable(boolean isFirst) {
-		eventLayer.setZoomer(gui.getZoomer());
+		eventLayer.setZoomer(getGui().getZoomer());
     	App.debug("Screen " + id + " is available");
 	}
 
@@ -273,7 +276,7 @@ public abstract class Screen extends MultiLayer implements AnimationCallback, Ga
 
 	public void reload() {
 		onReload();
-		listener.changeScreen(id);
+		getListener().navigateTo(id);
 	}
 
 	private void onReload() {

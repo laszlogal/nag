@@ -137,6 +137,10 @@ public class MultiLayer extends NAGObject implements Loadable {
 		return true;
 	}
 
+	public boolean prepare() {
+		return load();
+	}
+
 	@Override
 	public boolean unload() {
 		if (layerMap == null) {

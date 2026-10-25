@@ -1,11 +1,11 @@
 package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
-import hu.norbisquest.nagbase.common.engine.ScreenListener;
+import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.game.Stage;
 
 /** Coordinates the game's single in-flight screen transition. */
-public final class ScreenCoordinator implements ScreenListener {
+public final class ScreenCoordinator implements ScreenNavigation {
     public enum State {
         READY,
         LOADING,
@@ -34,12 +34,12 @@ public final class ScreenCoordinator implements ScreenListener {
     }
 
     @Override
-    public void changeScreen(Stage.Id id) {
-        changeScreen(id, true);
+    public void navigateTo(Stage.Id id) {
+        navigateTo(id, true);
     }
 
     @Override
-    public void changeScreen(final Stage.Id id, final boolean clear) {
+    public void navigateTo(final Stage.Id id, final boolean clear) {
         if (state != State.READY) {
             return;
         }
@@ -51,7 +51,7 @@ public final class ScreenCoordinator implements ScreenListener {
         state = State.LOADING;
         try {
             host.pauseScreen();
-            factory.create(id, new ScreenCreationCallback() {
+            factory.create(id, this, new ScreenCreationCallback() {
                 private boolean completed;
                 private StagedScreen accepted;
 
@@ -111,8 +111,7 @@ public final class ScreenCoordinator implements ScreenListener {
 
         GameScreen nextScreen = next.getScreen();
         try {
-            nextScreen.setListener(this);
-            if (!nextScreen.load()) {
+            if (!nextScreen.prepare()) {
                 throw new IllegalStateException(
                         "Screen refused to load: " + id);
             }

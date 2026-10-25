@@ -164,8 +164,8 @@ public abstract class Stage extends Screen
 		return processor.isIdle();
 	}
 	@Override
-	public void execute(double timestamp) {
-		if (!isValid()) {
+	public void update(double timestamp) {
+		if (!this.isValid()) {
 			return;
 		}
 
@@ -215,7 +215,7 @@ public abstract class Stage extends Screen
 			App.unblock();
 		}
 		if (Browser.isAndroid() && processor.isIdle()) {
-			gui.getToolbar().setVisible(true);
+			getGui().getToolbar().setVisible(true);
 		}
 
 	}
@@ -227,7 +227,7 @@ public abstract class Stage extends Screen
 	@Override
 	public void onClick(int x, int y) {
 		App.debug("click");
-		if (gui.hideMenu()) {
+		if (getGui().hideMenu()) {
 			return;
 		}
 		if (!handleTargetAt(x, y)) {
@@ -281,11 +281,11 @@ public abstract class Stage extends Screen
 
 		case USE:
 			if (ctrl instanceof TalkControl) {
-				gui.zoomOut();
+				getGui().zoomOut();
 				cmds = ((TalkControl) ctrl).onTalk(x, y);
 
 			} else {
-				gui.zoomOut();
+				getGui().zoomOut();
 				cmds = ctrl.onUse(x, y);
 			}
 			break;
@@ -294,7 +294,7 @@ public abstract class Stage extends Screen
 			cmds = ctrl.onWalk(x, y);
 			break;
 		case INVENTORY:
-			gui.zoomOut();
+			getGui().zoomOut();
 			cmds = ctrl.onInventory(App.getInventory().getSelectedItem().getId());
 			break;
 		default:
@@ -318,7 +318,7 @@ public abstract class Stage extends Screen
 	}
 
 	private void onLeaveStage() {
-		gui.closesAllDialogs();
+		getGui().closesAllDialogs();
 		App.setRootStyle("fade-out");
 		hotSpots.save();
 	}
@@ -355,7 +355,7 @@ public abstract class Stage extends Screen
 
 			@Override
 			public void start() {
-				getListener().changeScreen(id);
+				getListener().navigateTo(id);
 			}
 		};
 	}
@@ -471,6 +471,6 @@ public abstract class Stage extends Screen
 	}
 
 	protected void zoom(int x, int y) {
-		gui.zoom(x, y);
+		getGui().zoom(x, y);
 	}
 }

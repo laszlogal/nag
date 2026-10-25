@@ -2,7 +2,7 @@
 
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 import hu.norbisquest.nagbase.common.engine.Command;
-import hu.norbisquest.nagbase.common.engine.ScreenListener;
+import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.common.game.StageFactory;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.App.GameModes;
@@ -22,7 +22,7 @@ public abstract class NQ1Stage extends NQStage {
 	class DoorControl extends WalkControl {
 
 		private static final int GRAB_TIME = 10;
-		private ScreenListener listener;
+		private ScreenNavigation listener;
 		private Id exitId;
 		private int grabDirection;
 

@@ -1,7 +1,7 @@
 package hu.norbisquest.nq1.client.game.actors;
 
 import hu.norbisquest.nagbase.common.engine.Command;
-import hu.norbisquest.nagbase.common.engine.ScreenListener;
+import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.core.layer.Layer;
 import hu.norbisquest.nagbase.core.layer.MaskedLayer;
 import hu.norbisquest.nagbase.game.Actor;
@@ -33,7 +33,7 @@ public class BusDriver extends ActorTarget {
 	private int left;
 	private boolean goingBack;
 	private BusDriverConversation cvBusDriver;
-	private ScreenListener listener;
+	private ScreenNavigation listener;
 	private MaskedLayer maskedLayer;
 
 	private static final int PAUSE_BUS_STARTS = 50;
@@ -195,11 +195,11 @@ public class BusDriver extends ActorTarget {
 		return result;
 	}
 
-	public ScreenListener getListener() {
+	public ScreenNavigation getListener() {
 		return listener;
 	}
 
-	public void setListener(ScreenListener listener) {
+	public void setListener(ScreenNavigation listener) {
 		this.listener = listener;
 	}
 

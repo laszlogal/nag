@@ -1,8 +1,8 @@
 package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
-import hu.norbisquest.nagbase.common.engine.ScreenListener;
-import hu.norbisquest.nagbase.common.gui.GameGUI;
+import hu.norbisquest.nagbase.common.engine.ScreenContext;
+import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.game.Stage;
 import org.junit.Test;
 
@@ -20,14 +20,14 @@ public class ScreenCoordinatorTest {
         FakeStagedScreen next = new FakeStagedScreen(TestId.CORRIDOR);
         fixture.host.current = previous;
 
-        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.coordinator.navigateTo(TestId.CORRIDOR);
         fixture.factory.succeed(0, next);
 
         assertEquals(ScreenCoordinator.State.READY, fixture.coordinator.getState());
         assertSame(next.screen, fixture.host.getScreen());
         assertTrue(previous.isDestroyed());
         assertEquals(1, next.screen.loadCount);
-        assertSame(fixture.coordinator, next.screen.listener);
+        assertSame(fixture.coordinator, fixture.factory.navigations.get(0));
         assertTrue(next.activated);
         assertTrue(next.clearCurrentContent);
         assertEquals(1, fixture.stateStore.commits.size());
@@ -41,7 +41,7 @@ public class ScreenCoordinatorTest {
         Fixture fixture = new Fixture();
         RuntimeException failure = new RuntimeException("chunk failed");
 
-        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.coordinator.navigateTo(TestId.CORRIDOR);
         fixture.factory.fail(0, failure);
 
         assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
@@ -56,7 +56,7 @@ public class ScreenCoordinatorTest {
         FakeStagedScreen rejected = new FakeStagedScreen(TestId.CORRIDOR);
         rejected.screen.loadResult = false;
 
-        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.coordinator.navigateTo(TestId.CORRIDOR);
         fixture.factory.succeed(0, rejected);
 
         assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
@@ -71,7 +71,7 @@ public class ScreenCoordinatorTest {
         FakeStagedScreen rejected = new FakeStagedScreen(TestId.CORRIDOR);
         rejected.activationFailure = new RuntimeException("activation failed");
 
-        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.coordinator.navigateTo(TestId.CORRIDOR);
         fixture.factory.succeed(0, rejected);
 
         assertTrue(rejected.isDestroyed());
@@ -85,7 +85,7 @@ public class ScreenCoordinatorTest {
         FakeStagedScreen rejected = new FakeStagedScreen(TestId.CORRIDOR);
         fixture.host.replaceFailure = new RuntimeException("host rejected screen");
 
-        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.coordinator.navigateTo(TestId.CORRIDOR);
         fixture.factory.succeed(0, rejected);
 
         assertTrue(rejected.isDestroyed());
@@ -98,8 +98,8 @@ public class ScreenCoordinatorTest {
         Fixture fixture = new Fixture();
         FakeStagedScreen next = new FakeStagedScreen(TestId.ROOM);
 
-        fixture.coordinator.changeScreen(TestId.ROOM);
-        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.coordinator.navigateTo(TestId.ROOM);
+        fixture.coordinator.navigateTo(TestId.CORRIDOR);
 
         assertEquals(1, fixture.host.pauseCount);
         assertEquals(1, fixture.factory.callbacks.size());
@@ -113,7 +113,7 @@ public class ScreenCoordinatorTest {
 
         fixture.factory.succeed(0, next);
         assertFalse(next.isDestroyed());
-        fixture.coordinator.changeScreen(TestId.CORRIDOR);
+        fixture.coordinator.navigateTo(TestId.CORRIDOR);
         assertEquals(2, fixture.factory.callbacks.size());
     }
 
@@ -122,7 +122,7 @@ public class ScreenCoordinatorTest {
         Fixture fixture = new Fixture();
         FakeStagedScreen late = new FakeStagedScreen(TestId.ROOM);
 
-        fixture.coordinator.changeScreen(TestId.ROOM);
+        fixture.coordinator.navigateTo(TestId.ROOM);
         fixture.coordinator.stop();
         fixture.factory.succeed(0, late);
 
@@ -136,7 +136,7 @@ public class ScreenCoordinatorTest {
         Fixture fixture = new Fixture();
         FakeStagedScreen next = new FakeStagedScreen(TestId.ROOM);
 
-        fixture.coordinator.changeScreen(TestId.ROOM, false);
+        fixture.coordinator.navigateTo(TestId.ROOM, false);
         fixture.factory.succeed(0, next);
 
         assertTrue(next.activated);
@@ -165,9 +165,12 @@ public class ScreenCoordinatorTest {
 
     private static final class ManualScreenFactory implements ScreenFactory {
         private final List<ScreenCreationCallback> callbacks = new ArrayList<>();
+        private final List<ScreenNavigation> navigations = new ArrayList<>();
 
         @Override
-        public void create(Stage.Id id, ScreenCreationCallback callback) {
+        public void create(Stage.Id id, ScreenNavigation navigation,
+                           ScreenCreationCallback callback) {
+            navigations.add(navigation);
             callbacks.add(callback);
         }
 
@@ -284,7 +287,7 @@ public class ScreenCoordinatorTest {
         private boolean destroyed;
         private boolean loadResult = true;
         private int loadCount;
-        private ScreenListener listener;
+        private ScreenContext context;
 
         private FakeScreen(Stage.Id id) {
             this.id = id;
@@ -295,15 +298,16 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public void setGui(GameGUI gui) {
+        public void attach(ScreenContext context) {
+            this.context = context;
         }
 
         @Override
-        public void show() {
+        public void enter() {
         }
 
         @Override
-        public boolean isValid() {
+        public boolean isReady() {
             return !destroyed;
         }
 
@@ -313,12 +317,13 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public void setListener(ScreenListener listener) {
-            this.listener = listener;
+        public boolean prepare() {
+            loadCount++;
+            return loadResult;
         }
 
         @Override
-        public void execute(double timestamp) {
+        public void update(double timestamp) {
         }
 
         @Override

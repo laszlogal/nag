@@ -44,7 +44,7 @@ public final class MainMenu extends NQ1Screen {
 		if (trgStart.isHit(x, y)) {
 			setFadeTo(NQ1Ids.PoorNorbi);
 		} else if (trgLoad.isHit(x, y)) {
-			gui.getDialogManager().showLoadDialog();
+			getGui().getDialogManager().showLoadDialog();
 		} else if (trgSetup.isHit(x, y)) {
 			setFadeTo(NQ1Ids.Setup);
 		} else if (trgExit.isHit(x, y)) {

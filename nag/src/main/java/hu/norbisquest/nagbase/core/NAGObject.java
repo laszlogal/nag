@@ -10,6 +10,7 @@ public class NAGObject implements Destroyable {
 		App.debug("["  + getPrefix() + "] "+ msg);
 
 	}
+
 	public boolean isValid() {return !destroyed;}
 
 	@Override

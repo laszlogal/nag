@@ -76,7 +76,7 @@ public class MultiAnimation extends NAGObject implements IAnimation {
 
 	@Override
 	public void update() {
-		if (!isValid()) {
+		if (!this.isValid()) {
 			return;
 		}
 
@@ -85,7 +85,7 @@ public class MultiAnimation extends NAGObject implements IAnimation {
 
 	@Override
 	public CanvasElement getCurrentFrame() {
-		if (!isValid()) {
+		if (!this.isValid()) {
 			return null;
 		}
 		return anim.getCurrentFrame();

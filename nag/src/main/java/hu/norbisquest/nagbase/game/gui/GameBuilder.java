@@ -3,7 +3,6 @@ package hu.norbisquest.nagbase.game.gui;
 import com.google.gwt.resources.client.TextResource;
 import hu.norbisquest.nagbase.common.gui.DialogManager;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
-import hu.norbisquest.nagbase.common.gui.HasContent;
 import hu.norbisquest.nagbase.core.Browser;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Cursor;
@@ -41,7 +40,7 @@ public abstract class GameBuilder {
                 new GwtFatalErrorHandler(gui.getContent(), gameLoop, display));
         engine = new Engine(gameLoop, display, coordinator);
         engine.addChangeScreenHandler(gui);
-        coordinator.changeScreen(App.getSettings().getStartId());
+        coordinator.navigateTo(App.getSettings().getStartId());
     }
 
     protected abstract Settings createSettings();
@@ -60,7 +59,7 @@ public abstract class GameBuilder {
     protected abstract List<TextResource> getCssResources();
 
 
-    public abstract ScreenFactory createScreenFactory(HasContent parent);
+    public abstract ScreenFactory createScreenFactory(GameGUI gui);
 
     public abstract GameGUI createGui(DialogManager dialogManager);
 

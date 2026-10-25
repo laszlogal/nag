@@ -393,8 +393,8 @@ public class S01Room extends NQ1Stage {
 	}
 
 	@Override
-	public void execute(double timestamp) {
-		super.execute(timestamp);
+	public void update(double timestamp) {
+		super.update(timestamp);
 
 		if (tvProgram != null && tvProgram.tick(timestamp) && tvProgram.isRunning()) {
 			tvLayer.clear();

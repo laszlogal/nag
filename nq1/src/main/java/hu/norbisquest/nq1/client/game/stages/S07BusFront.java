@@ -37,9 +37,9 @@ public class S07BusFront extends NQ1Stage {
 	}
 
 	@Override
-	public void execute(double timestamp) {
-		super.execute(timestamp);
-		if (isValid()) {
+	public void update(double timestamp) {
+		super.update(timestamp);
+		if (this.isValid()) {
 
 			if (!driverCameOut) {
 				driverCameOut = BusDriver.get().cameOut();

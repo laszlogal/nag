@@ -14,13 +14,13 @@ public class TestScreen1 extends Splash {
 	}
 
 	@Override
-	public void execute(double timestamp) {
+	public void update(double timestamp) {
 
 	}
 
 	@Override
 	public void onClick(int x, int y) {
-		getListener().changeScreen(NQ1Settings.get().getReferer());
+		getListener().navigateTo(NQ1Settings.get().getReferer());
 	}
 
 

@@ -386,8 +386,8 @@ public class S06BusStop extends NQ1Stage {
 		getStageItem(BusStop.HotSpots.BACK_DOOR).setControl(null);
 	}
 	@Override
-	public void execute(double timestamp) {
-		super.execute(timestamp);
+	public void update(double timestamp) {
+		super.update(timestamp);
 		if (busCommand == null || !busCommand.isValid()) {
 			return;
 		}

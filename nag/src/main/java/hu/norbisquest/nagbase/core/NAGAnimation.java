@@ -188,7 +188,7 @@ public class NAGAnimation extends NAGCanvas implements Loadable, Tickable, IAnim
 
 	@Override
 	public void update() {
-		if (!isValid()) {
+		if (!this.isValid()) {
 			return;
 		}
 

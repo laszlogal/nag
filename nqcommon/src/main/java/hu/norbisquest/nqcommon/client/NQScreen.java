@@ -26,12 +26,12 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 		super(left, top, width, height, parent);	}
 
 	@Override
-	public boolean isValid() {
+	public boolean isReady() {
 		return getBackground().isLoaded();
 	}
 
 	@Override
-	public void execute(double timestamp) {
+	public void update(double timestamp) {
 		if (fadeTo == null || transitionRequested) {
 			return;
 		}
@@ -45,7 +45,7 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 	}
 
 	protected void onFadeOut() {
-		getListener().changeScreen(fadeTo);
+		getListener().navigateTo(fadeTo);
 	}
 
 	@Override
@@ -117,8 +117,8 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 
 		Touch t = touches.get(0);
 		CanvasElement eventCanvas = getEventLayer().getCanvas().getCanvasElement();
-		int x = gui.toScaledX(t.getRelativeX(eventCanvas));
-		int y = gui.toScaledY(t.getRelativeY(eventCanvas));
+		int x = getGui().toScaledX(t.getRelativeX(eventCanvas));
+		int y = getGui().toScaledY(t.getRelativeY(eventCanvas));
 		onClick(x, y);
 	}
 }

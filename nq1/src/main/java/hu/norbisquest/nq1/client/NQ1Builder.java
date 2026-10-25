@@ -4,7 +4,6 @@ import com.google.gwt.resources.client.TextResource;
 import com.google.gwt.user.client.Window;
 import hu.norbisquest.nagbase.common.gui.DialogManager;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
-import hu.norbisquest.nagbase.common.gui.HasContent;
 import hu.norbisquest.nagbase.game.AbstractDialogManager;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.App.GameModes;
@@ -60,8 +59,8 @@ public class NQ1Builder extends GameBuilder {
 	}
 
 	@Override
-	public ScreenFactory createScreenFactory(HasContent parent) {
-		return new NQ1ScreenFactory(parent);
+	public ScreenFactory createScreenFactory(GameGUI gui) {
+		return new NQ1ScreenFactory(gui);
 	}
 
 	@Override

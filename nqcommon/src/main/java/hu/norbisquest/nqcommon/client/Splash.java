@@ -36,7 +36,7 @@ public class Splash extends Screen implements EventLayerListener {
 	}
 
 	@Override
-	public boolean isValid() {
+	public boolean isReady() {
 		return getBackground() != null && getBackground().isLoaded();
 	}
 
@@ -46,7 +46,7 @@ public class Splash extends Screen implements EventLayerListener {
 	}
 
 	@Override
-	public void execute(double timestamp) {
+	public void update(double timestamp) {
 		timer++;
 		if (timer == hold) {
 			if (fadeOut != -1) {
@@ -58,7 +58,7 @@ public class Splash extends Screen implements EventLayerListener {
 	}
 
 	protected void onFadeOut() {
-		getListener().changeScreen(next, isClear());
+		getListener().navigateTo(next, isClear());
 
 	}
 

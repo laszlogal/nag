@@ -130,6 +130,7 @@ dependencies {
 
 gwt {
     gwtVersion = '2.13.1'
+    sourceLevel = '17'
 
     modules = [devModule]
 

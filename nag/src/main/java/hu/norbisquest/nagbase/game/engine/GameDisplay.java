@@ -31,7 +31,7 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
             return;
         }
         if (isScreenChanged()) {
-            currentScreen().show();
+            currentScreen().enter();
             changed = false;
         } else {
             executeScreen(timestamp);
@@ -52,8 +52,8 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     }
 
     private void executeScreen(double timestamp) {
-        if (isScreenValid()) {
-            currentScreen().execute(timestamp);
+        if (isScreenReady()) {
+            currentScreen().update(timestamp);
         }
     }
 
@@ -81,16 +81,16 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
         return null;
     }
 
-    private boolean isScreenValid() {
+    private boolean isScreenReady() {
         if (stagedScreen == null) {
             return false;
         }
         GameScreen screen = stagedScreen.getScreen();
-        return screen != null && screen.isValid();
+        return screen != null && screen.isReady();
     }
 
     private boolean isScreenChanged() {
-        return isScreenValid() && changed;
+        return isScreenReady() && changed;
     }
 
     private void notifyScreenChanged(GameScreen screen) {

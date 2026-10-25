@@ -220,7 +220,7 @@ public abstract class Actor extends MultiAnimation implements Loadable {
 	public void setPosition(int x, int y) {
 		posX = x;
 		posY = y;
-		if (isValid()) {
+		if (this.isValid()) {
 			update();
 		}
 	}

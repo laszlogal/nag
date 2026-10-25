@@ -23,8 +23,8 @@ public class S11PlayBass extends NQ1Stage {
 	private static final int PLAY_Y = 240;
 	private static final double BOOM_X = 300;
 	private static final double BOOM_Y = 70;
-	private NAGAnimation boom;
-	private Layer boomLayer;
+	private final NAGAnimation boom;
+	private final Layer boomLayer;
 
 
 	public S11PlayBass(StageFactory factory) {
@@ -37,8 +37,8 @@ public class S11PlayBass extends NQ1Stage {
 	}
 
 	@Override
-	public boolean isValid() {
-		return super.isValid() && boom.isValid();
+	public boolean isReady() {
+		return super.isReady() && boom.isValid();
 	}
 
 	@Override
@@ -57,13 +57,13 @@ public class S11PlayBass extends NQ1Stage {
 	}
 
 	@Override
-	public void execute(double timestamp) {
+	public void update(double timestamp) {
 		if (boom.isRunning() && boom.tick(timestamp)) {
 			boomLayer.clear();
 			boomLayer.draw(boom, BOOM_X, BOOM_Y);
 
 		}
-		super.execute(timestamp);
+		super.update(timestamp);
 	}
 
 	private List<Command> play() {

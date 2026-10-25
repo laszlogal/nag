@@ -126,7 +126,7 @@ public abstract class GameGuiSimple extends FlowPanel implements GameGUI {
 
 	@Override
 	public void onScreenChanged(GameScreen screen) {
-		screen.setGui(this);
+		// Screen dependencies are attached atomically during creation.
 	}
 
 	@Override

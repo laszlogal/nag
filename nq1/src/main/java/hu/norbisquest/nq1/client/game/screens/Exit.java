@@ -28,7 +28,7 @@ public final class Exit extends Splash {
 		Browser.exitApp();
 	}
 
-	public boolean load() {
+	public boolean prepare() {
 		return true;
 	}
 

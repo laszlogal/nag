@@ -1,7 +1,9 @@
 package hu.norbisquest.nq1.client.factory;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import hu.norbisquest.nagbase.common.gui.HasContent;
+import hu.norbisquest.nagbase.common.engine.ScreenContext;
+import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
+import hu.norbisquest.nagbase.common.gui.GameGUI;
 import hu.norbisquest.nagbase.game.Stage;
 import hu.norbisquest.nagbase.game.engine.ScreenCreationCallback;
 import hu.norbisquest.nagbase.game.engine.ScreenCreator;
@@ -15,14 +17,16 @@ import java.util.Map;
 
 /** The single registry for every screen that can currently be created by NQ1. */
 public final class NQ1ScreenFactory implements ScreenFactory {
+    private final GameGUI gui;
     private final FlowPanel activeParent;
     private final Map<NQ1Ids, ScreenCreator> creators = new EnumMap<>(NQ1Ids.class);
 
-    public NQ1ScreenFactory(HasContent content) {
-        if (content == null || content.getContent() == null) {
-            throw new IllegalArgumentException("content must not be null");
+    public NQ1ScreenFactory(GameGUI gui) {
+        if (gui == null || gui.getContent() == null) {
+            throw new IllegalArgumentException("gui must not be null");
         }
-        activeParent = content.getContent();
+        this.gui = gui;
+        activeParent = gui.getContent();
         registerScreens();
     }
 
@@ -51,7 +55,8 @@ public final class NQ1ScreenFactory implements ScreenFactory {
     }
 
     @Override
-    public void create(Stage.Id id, ScreenCreationCallback callback) {
+    public void create(Stage.Id id, ScreenNavigation navigation,
+                       ScreenCreationCallback callback) {
         if (!(id instanceof NQ1Ids)) {
             callback.onFailure(new IllegalArgumentException("Unsupported screen id: " + id));
             return;
@@ -63,7 +68,8 @@ public final class NQ1ScreenFactory implements ScreenFactory {
             return;
         }
 
-        StagedScreenParent parent = new StagedScreenParent(activeParent, callback);
+        StagedScreenParent parent = new StagedScreenParent(
+                activeParent, new ScreenContext(gui, navigation), callback);
         try {
             creator.create(parent);
         } catch (Throwable cause) {

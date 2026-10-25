@@ -1,7 +1,7 @@
 package hu.norbisquest.nq1.client.game.actors;
 
 import hu.norbisquest.nagbase.common.engine.Command;
-import hu.norbisquest.nagbase.common.engine.ScreenListener;
+import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.game.SpeechEnum;
 import hu.norbisquest.nagbase.game.command.OneShotCommand;
 import hu.norbisquest.nagbase.game.conversation.Conversation;
@@ -24,7 +24,7 @@ public class Punk extends ActorTarget {
 	private static final int GRAB = 2;
 
 	private static Punk INSTANCE = null;
-	private ScreenListener listener;
+	private ScreenNavigation listener;
 	private HotSpot hotSpot;
 
 	public static class Cmd extends hu.norbisquest.nagbase.game.command.Cmd {
@@ -110,11 +110,11 @@ public class Punk extends ActorTarget {
         }
         return list;
     }
-        public ScreenListener getListener() {
+        public ScreenNavigation getListener() {
 		return listener;
 	}
 
-	public void setListener(ScreenListener listener) {
+	public void setListener(ScreenNavigation listener) {
 		this.listener = listener;
 	}
 

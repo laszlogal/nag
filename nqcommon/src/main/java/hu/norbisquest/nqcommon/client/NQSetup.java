@@ -53,7 +53,7 @@ public abstract class NQSetup extends NQScreen {
 	}
 
 	protected void onBack() {
-		getListener().changeScreen(getMainMenuId());
+		getListener().navigateTo(getMainMenuId());
 	}
 
 	@Override
