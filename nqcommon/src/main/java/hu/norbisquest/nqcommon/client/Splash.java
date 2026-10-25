@@ -37,7 +37,9 @@ public class Splash extends Screen implements EventLayerListener {
 
 	@Override
 	public boolean isReady() {
-		return getBackground() != null && getBackground().isLoaded();
+		return super.isValid()
+				&& getBackground() != null
+				&& getBackground().isLoaded();
 	}
 
 	@Override

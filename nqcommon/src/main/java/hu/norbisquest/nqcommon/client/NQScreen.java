@@ -27,7 +27,9 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 
 	@Override
 	public boolean isReady() {
-		return getBackground().isLoaded();
+		return super.isValid()
+				&& getBackground() != null
+				&& getBackground().isLoaded();
 	}
 
 	@Override
