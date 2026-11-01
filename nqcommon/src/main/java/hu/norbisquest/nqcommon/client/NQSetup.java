@@ -32,6 +32,17 @@ public abstract class NQSetup extends NQScreen {
 	protected abstract void setAudioTarget(SpeechMode mode, boolean value);
 	protected abstract SimpleTarget createBackTarget();
 
+	@Override
+	public boolean prepare() {
+		if (!super.prepare()) {
+			return false;
+		}
+		if (trgBack == null) {
+			createTargets();
+		}
+		return true;
+	}
+
 	private void setTargets() {
 
 		SpeechMode mode = App.getSettings().getSpeechMode();
@@ -45,9 +56,6 @@ public abstract class NQSetup extends NQScreen {
 	@Override
 	protected void onAvailable(boolean isFirst) {
 		App.getCursor().normal();
-		if (trgBack == null) {
-			createTargets();
-		}
 		setTargets();
 		super.onAvailable(isFirst);
 	}

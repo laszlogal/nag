@@ -21,16 +21,17 @@ public final class Setup extends NQSetup {
 	}
 	private class ImageTarget extends SimpleTarget {
 		private Image img;
-		private boolean valid;
+		private boolean loaded;
+		private Throwable loadFailure;
 
 		ImageTarget(final int left, final int top, ImageResource res) {
 			super("", left, top, 0, 0);
-			img = new Image(res);
+			img = new Image();
 			img.setVisible(false);
 			img.getElement().getStyle().setPosition(Position.ABSOLUTE);
 			img.getElement().getStyle().setZIndex(Layer.Z_BACKGROUND + 1);
 			img.addLoadHandler(event -> {
-                valid = true;
+				loaded = true;
                 img.addStyleName("imageTarget");
                 img.getElement().getStyle().setLeft(left, Unit.PX);
                 img.getElement().getStyle().setTop(top, Unit.PX);
@@ -38,6 +39,9 @@ public final class Setup extends NQSetup {
                 setBottom(top + img.getHeight());
 
             });
+			img.addErrorHandler(event -> loadFailure =
+					new IllegalStateException("Setup target image failed to load"));
+			img.setResource(res);
 
 			controlsParent.add(img);
 		}
@@ -46,12 +50,12 @@ public final class Setup extends NQSetup {
 			img.removeFromParent();
 		}
 
-		public boolean isValid() {
-			return valid;
+		boolean isLoaded() {
+			return loaded;
 		}
 
-		public void setValid(boolean valid) {
-			this.valid = valid;
+		Throwable getLoadFailure() {
+			return loadFailure;
 		}
 
 		void setOn(boolean value) {
@@ -95,6 +99,29 @@ public final class Setup extends NQSetup {
 	@Override
 	public SimpleTarget createBackTarget() {
 		return new SimpleTarget("", 105, 260, 200, 295);
+	}
+
+	@Override
+	public boolean isReady() {
+		if (!super.isReady()) {
+			return false;
+		}
+		for (SpeechMode mode : SpeechMode.values()) {
+			SimpleTarget target = getAudioTarget(mode);
+			if (!(target instanceof ImageTarget)) {
+				return false;
+			}
+			ImageTarget imageTarget = (ImageTarget) target;
+			if (imageTarget.getLoadFailure() != null) {
+				throw new IllegalStateException(
+						"Setup screen failed to become ready",
+						imageTarget.getLoadFailure());
+			}
+			if (!imageTarget.isLoaded()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override

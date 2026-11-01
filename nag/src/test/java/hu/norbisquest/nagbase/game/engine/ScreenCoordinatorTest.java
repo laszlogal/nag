@@ -129,6 +129,30 @@ public class ScreenCoordinatorTest {
     }
 
     @Test
+    public void stateIsCommittedOnlyAfterPresentation() {
+        Fixture fixture = new Fixture();
+        fixture.host.autoPresent = false;
+        FakeStagedScreen previous = new FakeStagedScreen(TestId.ROOM);
+        FakeStagedScreen next = new FakeStagedScreen(TestId.CORRIDOR);
+        fixture.host.current = previous;
+
+        fixture.coordinator.navigateTo(TestId.CORRIDOR);
+        fixture.factory.succeed(0, next);
+
+        assertEquals(ScreenCoordinator.State.LOADING, fixture.coordinator.getState());
+        assertSame(previous.screen, fixture.host.getScreen());
+        assertFalse(previous.isDestroyed());
+        assertTrue(fixture.stateStore.commits.isEmpty());
+
+        fixture.host.presentPending();
+
+        assertEquals(ScreenCoordinator.State.READY, fixture.coordinator.getState());
+        assertSame(next.screen, fixture.host.getScreen());
+        assertTrue(previous.isDestroyed());
+        assertEquals(1, fixture.stateStore.commits.size());
+    }
+
+    @Test
     public void stopDestroysLateResultWithoutShowingFatalError() {
         Fixture fixture = new Fixture();
         FakeStagedScreen late = new FakeStagedScreen(TestId.ROOM);
@@ -140,6 +164,23 @@ public class ScreenCoordinatorTest {
         assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
         assertTrue(late.isDestroyed());
         assertEquals(0, fixture.failures.causes.size());
+    }
+
+    @Test
+    public void stopDestroysScreenWaitingForReadiness() {
+        Fixture fixture = new Fixture();
+        fixture.host.autoPresent = false;
+        FakeStagedScreen pending = new FakeStagedScreen(TestId.ROOM);
+
+        fixture.coordinator.navigateTo(TestId.ROOM);
+        fixture.factory.succeed(0, pending);
+        fixture.coordinator.stop();
+
+        assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
+        assertTrue(pending.isDestroyed());
+        assertNull(fixture.host.pending);
+        assertTrue(fixture.stateStore.commits.isEmpty());
+        assertTrue(fixture.failures.causes.isEmpty());
     }
 
     @Test
@@ -230,9 +271,12 @@ public class ScreenCoordinatorTest {
 
     private static final class RecordingHost implements ScreenHost {
         private StagedScreen current;
+        private StagedScreen pending;
+        private ScreenPresentationCallback presentationCallback;
         private RuntimeException replaceFailure;
         private int pauseCount;
         private TransitionEffect transitionEffect;
+        private boolean autoPresent = true;
 
         @Override
         public void pauseScreen() {
@@ -245,16 +289,48 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public void replaceScreen(StagedScreen next, TransitionEffect effect) {
+        public void presentWhenReady(StagedScreen next, TransitionEffect effect,
+                                     ScreenPresentationCallback callback) {
             if (replaceFailure != null) {
                 throw replaceFailure;
             }
+            pending = next;
+            presentationCallback = callback;
+            next.getScreen().setInputEnabled(false);
+            transitionEffect = effect;
+            if (autoPresent) {
+                presentPending();
+            }
+        }
+
+        @Override
+        public void cancelPresentation() {
+            StagedScreen cancelled = pending;
+            pending = null;
+            presentationCallback = null;
+            if (cancelled != null) {
+                cancelled.destroy();
+            }
+        }
+
+        private void presentPending() {
+            StagedScreen next = pending;
+            ScreenPresentationCallback callback = presentationCallback;
+            pending = null;
+            presentationCallback = null;
+            try {
+                next.activate();
+            } catch (Throwable cause) {
+                next.destroy();
+                callback.onFailure(cause);
+                return;
+            }
             StagedScreen previous = current;
             current = next;
-            transitionEffect = effect;
             if (previous != null) {
                 previous.destroy();
             }
+            callback.onPresented();
         }
     }
 
@@ -293,6 +369,7 @@ public class ScreenCoordinatorTest {
         private final ScreenId id;
         private boolean destroyed;
         private boolean loadResult = true;
+        private boolean inputEnabled = true;
         private int loadCount;
         private ScreenContext context;
 
@@ -302,6 +379,7 @@ public class ScreenCoordinatorTest {
 
         @Override
         public void setInputEnabled(boolean enabled) {
+            inputEnabled = enabled;
         }
 
         @Override

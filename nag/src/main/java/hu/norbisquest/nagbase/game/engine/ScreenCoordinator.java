@@ -100,6 +100,7 @@ public final class ScreenCoordinator implements ScreenNavigation {
 
     public void stop() {
         state = State.STOPPED;
+        host.cancelPresentation();
     }
 
     private void accept(ScreenId id, TransitionEffect effect, StagedScreen next) {
@@ -125,10 +126,30 @@ public final class ScreenCoordinator implements ScreenNavigation {
             GameScreen previous = host.getScreen();
             ScreenId referer = previous == null ? null : previous.getId();
 
-            next.activate();
-            host.replaceScreen(next, effect);
-            stateStore.commit(referer, id);
-            state = State.READY;
+            host.presentWhenReady(next, effect,
+                    new ScreenPresentationCallback() {
+                        @Override
+                        public void onPresented() {
+                            if (state != State.LOADING) {
+                                return;
+                            }
+                            try {
+                                stateStore.commit(referer, id);
+                                state = State.READY;
+                            } catch (Throwable cause) {
+                                failFatally(id, cause);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Throwable cause) {
+                            if (state == State.LOADING) {
+                                failFatally(id, cause != null ? cause
+                                        : new IllegalStateException(
+                                                "Screen presentation failed without a cause"));
+                            }
+                        }
+                    });
         } catch (Throwable cause) {
             if (host.getScreen() != nextScreen) {
                 destroy(next, cause);

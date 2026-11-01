@@ -9,6 +9,13 @@ public interface ScreenHost {
     /** Stops updates and input on the outgoing screen until replacement. */
     void pauseScreen();
 
-    /** Takes ownership of {@code screen} when invoked. */
-    void replaceScreen(StagedScreen screen, TransitionEffect effect);
+    /**
+     * Takes ownership after this method returns successfully and presents
+     * {@code screen} after it becomes ready.
+     */
+    void presentWhenReady(StagedScreen screen, TransitionEffect effect,
+                          ScreenPresentationCallback callback);
+
+    /** Cancels and destroys any presentation that has not completed entry. */
+    void cancelPresentation();
 }
