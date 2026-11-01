@@ -1,32 +1,33 @@
  package hu.norbisquest.nq1.client.game.stages;
 
-import com.google.gwt.event.dom.client.ContextMenuEvent;
-import hu.norbisquest.nagbase.common.engine.Command;
-import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
-import hu.norbisquest.nagbase.common.game.StageFactory;
-import hu.norbisquest.nagbase.game.App;
-import hu.norbisquest.nagbase.game.App.GameModes;
-import hu.norbisquest.nagbase.game.StageModel;
-import hu.norbisquest.nagbase.game.command.Cmd;
-import hu.norbisquest.nagbase.game.command.Cmd.Look;
-import hu.norbisquest.nq1.client.NQ1TextsEN;
-import hu.norbisquest.nq1.client.NQ1TextsHUN;
-import hu.norbisquest.nq1.client.data.bundle.Common;
-import hu.norbisquest.nq1.client.factory.InventoryFactory;
-import hu.norbisquest.nq1.client.game.actors.Norbi;
-import hu.norbisquest.nqcommon.client.NQStage;
+ import com.google.gwt.event.dom.client.ContextMenuEvent;
+ import hu.norbisquest.nagbase.common.engine.Command;
+ import hu.norbisquest.nagbase.common.engine.ScreenId;
+ import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
+ import hu.norbisquest.nagbase.common.game.StageFactory;
+ import hu.norbisquest.nagbase.game.App;
+ import hu.norbisquest.nagbase.game.App.GameModes;
+ import hu.norbisquest.nagbase.game.StageModel;
+ import hu.norbisquest.nagbase.game.command.Cmd;
+ import hu.norbisquest.nagbase.game.command.Cmd.Look;
+ import hu.norbisquest.nq1.client.NQ1TextsEN;
+ import hu.norbisquest.nq1.client.NQ1TextsHUN;
+ import hu.norbisquest.nq1.client.data.bundle.Common;
+ import hu.norbisquest.nq1.client.factory.InventoryFactory;
+ import hu.norbisquest.nq1.client.game.actors.Norbi;
+ import hu.norbisquest.nqcommon.client.NQStage;
 
-import java.util.List;
+ import java.util.List;
 
 public abstract class NQ1Stage extends NQStage {
 	class DoorControl extends WalkControl {
 
 		private static final int GRAB_TIME = 10;
 		private ScreenNavigation listener;
-		private Id exitId;
+		private ScreenId exitId;
 		private int grabDirection;
 
-		DoorControl(String label, Look look, Id exitId) {
+		DoorControl(String label, Look look, ScreenId exitId) {
 			super();
 			setLabel(label);
 			setLook(look);
@@ -99,7 +100,7 @@ public abstract class NQ1Stage extends NQStage {
 
 	}
 
-	DoorControl createDoorControl(String label, Look look, Id exitId) {
+	DoorControl createDoorControl(String label, Look look, ScreenId exitId) {
 		return new DoorControl(label, look, exitId);
 	}
 

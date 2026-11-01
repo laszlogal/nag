@@ -2,8 +2,8 @@ package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
 import hu.norbisquest.nagbase.common.engine.ScreenContext;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.core.ResourceScope;
-import hu.norbisquest.nagbase.game.Stage;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -138,7 +138,7 @@ public class GameDisplayTest {
         }
 
         @Override
-        public Stage.Id getId() {
+        public ScreenId getId() {
             return null;
         }
 

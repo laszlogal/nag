@@ -1,10 +1,10 @@
 package hu.norbisquest.nqcommon.client;
 
 import com.google.gwt.user.client.ui.FlowPanel;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.core.layer.ImageLayer;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Settings.SpeechMode;
-import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nagbase.game.target.SimpleTarget;
 
 public abstract class NQSetup extends NQScreen {
@@ -12,7 +12,7 @@ public abstract class NQSetup extends NQScreen {
 	private SimpleTarget trgTextAndAudio;
 	private SimpleTarget trgAudio;
 	private SimpleTarget trgText;
-	private Id mainMenuId;
+	private ScreenId mainMenuId;
 	protected NQSetup(FlowPanel parent, ImageLayer bgLayer) {
 		super(App.LEFT, App.TOP, App.WIDTH, App.HEIGHT, parent);
 		setBackground(bgLayer);
@@ -89,11 +89,11 @@ public abstract class NQSetup extends NQScreen {
 
 	}
 
-	protected Id getMainMenuId() {
+	protected ScreenId getMainMenuId() {
 		return mainMenuId;
 	}
 
-	protected void setMainMenuId(Id mainMenuId) {
+	protected void setMainMenuId(ScreenId mainMenuId) {
 		this.mainMenuId = mainMenuId;
 	}
 

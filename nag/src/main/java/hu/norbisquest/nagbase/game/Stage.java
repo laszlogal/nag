@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.resources.client.ImageResource;
 import hu.norbisquest.nagbase.common.engine.Command;
 import hu.norbisquest.nagbase.common.engine.CommandProcessor;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.game.StageFactory;
 import hu.norbisquest.nagbase.common.game.target.HotSpotContainer;
 import hu.norbisquest.nagbase.common.game.target.Target;
@@ -27,11 +28,7 @@ import java.util.List;
 public abstract class Stage extends Screen
 		implements EventLayerListener, CommandFeeder, RegionListener, ToolbarListener {
 
-	public interface Id {
-		Id toId(String name);
-	}
-
-    private MaskedLayer foreground;
+	private MaskedLayer foreground;
 	private List<Target> targets;
 	private HotSpotContainer hotSpots;
 	private CommandProcessor processor;
@@ -350,7 +347,7 @@ public abstract class Stage extends Screen
 		return true;
 	}
 
-	protected Command changeScreenCmd(final Id id) {
+	protected Command changeScreenCmd(final ScreenId id) {
 		return new OneShotCommand() {
 
 			@Override

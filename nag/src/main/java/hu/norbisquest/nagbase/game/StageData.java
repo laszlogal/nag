@@ -3,8 +3,8 @@ package hu.norbisquest.nagbase.game;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.resources.client.TextResource;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.core.NAGColor;
-import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nagbase.game.target.HotSpot;
 import hu.norbisquest.nagbase.game.target.StageItem;
 import hu.norbisquest.nagbase.game.walk.WalkGraphModel;
@@ -22,7 +22,7 @@ public abstract class StageData {
 
 	public abstract ImageResource background();
 
-	public abstract Id getId();
+	public abstract ScreenId getId();
 
 	public ImageResource maskTop() {
 		return null;

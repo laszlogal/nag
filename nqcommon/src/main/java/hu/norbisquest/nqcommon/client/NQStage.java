@@ -5,6 +5,7 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.*;
 import hu.norbisquest.nagbase.common.engine.Command;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.game.StageFactory;
 import hu.norbisquest.nagbase.common.game.target.Target;
 import hu.norbisquest.nagbase.core.Browser;
@@ -565,7 +566,7 @@ public abstract class NQStage extends Stage {
 
 	}
 
-	public void goToStage(String vLabel, Id id) {
+	public void goToStage(String vLabel, ScreenId id) {
 		WalkPoint wp = getGraph().getVertex(vLabel);
 		addCommandList(Arrays.asList(new WalkCommand(getNorbi(), (int) (wp.getX()), (int) (wp.getY()), true),
 				changeScreenCmd(id)));
@@ -625,7 +626,7 @@ public abstract class NQStage extends Stage {
 
 	}
 
-	public List<Command> fadeTo(Id stageId) {
+	public List<Command> fadeTo(ScreenId stageId) {
 		return Cmd.fadeOutToScreen(stageId, getListener(), false);
 
 	}

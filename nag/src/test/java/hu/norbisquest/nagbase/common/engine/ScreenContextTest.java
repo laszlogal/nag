@@ -1,7 +1,6 @@
 package hu.norbisquest.nagbase.common.engine;
 
 import hu.norbisquest.nagbase.common.gui.GameGUI;
-import hu.norbisquest.nagbase.game.Stage;
 import org.junit.Test;
 
 import java.lang.reflect.Proxy;
@@ -51,11 +50,11 @@ public class ScreenContextTest {
     private ScreenNavigation fakeNavigation() {
         return new ScreenNavigation() {
             @Override
-            public void navigateTo(Stage.Id id) {
+            public void navigateTo(ScreenId id) {
             }
 
             @Override
-            public void navigateTo(Stage.Id id, boolean clear) {
+            public void navigateTo(ScreenId id, boolean clear) {
             }
         };
     }

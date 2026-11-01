@@ -2,6 +2,7 @@ package hu.norbisquest.nagbase.game;
 
 import com.google.gwt.canvas.dom.client.ImageData;
 import com.google.gwt.resources.client.ImageResource;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.game.target.HotSpotContainer;
 import hu.norbisquest.nagbase.core.NAGImage;
 import hu.norbisquest.nagbase.core.NAGObject;
@@ -15,9 +16,9 @@ public class HotSpotContainerSimple extends NAGObject implements HotSpotContaine
     private Map<HotSpot.Id, HotSpot> items;
     private ImageData maskData =null;
     private NAGImage image;
-    private Stage.Id stageId;
+    private ScreenId stageId;
 
-    public HotSpotContainerSimple(Stage.Id stageId) {
+    public HotSpotContainerSimple(ScreenId stageId) {
         this.stageId = stageId;
         maskData = null;
         items = new HashMap<>();

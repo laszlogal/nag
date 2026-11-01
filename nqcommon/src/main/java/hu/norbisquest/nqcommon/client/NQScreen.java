@@ -5,16 +5,16 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.ui.FlowPanel;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.gui.ScreenDimension;
 import hu.norbisquest.nagbase.core.layer.EventLayerListener;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Screen;
-import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nagbase.game.engine.ScreenParent;
 
 public abstract class NQScreen extends Screen implements EventLayerListener {
 	private int fadeTimer = 50;
-	private Id fadeTo = null;
+	private ScreenId fadeTo = null;
 	private boolean transitionRequested;
 
 	protected NQScreen(int left, int top, int width, int height,
@@ -80,11 +80,11 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 		this.fadeTimer = fadeTimer;
 	}
 
-	public Id getFadeTo() {
+	public ScreenId getFadeTo() {
 		return fadeTo;
 	}
 
-	protected void setFadeTo(Id fadeToId) {
+	protected void setFadeTo(ScreenId fadeToId) {
 		if (transitionRequested) {
 			return;
 		}
@@ -92,7 +92,7 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 		App.setRootStyle("fade-out-slow");
 	}
 
-	public void setFadeTo(Id fadeToId, int timer) {
+	public void setFadeTo(ScreenId fadeToId, int timer) {
 		setFadeTimer(timer);
 		setFadeTo(fadeToId);
 	}

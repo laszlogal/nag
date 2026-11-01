@@ -2,11 +2,11 @@ package hu.norbisquest.nagbase.game.command;
 
 import com.google.gwt.resources.client.DataResource;
 import hu.norbisquest.nagbase.common.engine.Command;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.App.GameModes;
 import hu.norbisquest.nagbase.game.Stage;
-import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nagbase.game.Walker;
 import hu.norbisquest.nagbase.game.target.HotSpot;
 import hu.norbisquest.nagbase.game.target.StageItem;
@@ -47,11 +47,11 @@ public class Cmd {
 		};
 	}
 
-	public static Command changeScreen(Id screenId, ScreenNavigation listener) {
+	public static Command changeScreen(ScreenId screenId, ScreenNavigation listener) {
 		return new ChangeScreenCommand(screenId, listener);
 	}
 
-    public static List<Command> fadeOutToScreen(Id screenId, ScreenNavigation listener, boolean slow) {
+    public static List<Command> fadeOutToScreen(ScreenId screenId, ScreenNavigation listener, boolean slow) {
 		int waitForFadeOut = slow ? 50 : 20;
 		return Arrays.asList(
 				slow ? fadeOutSlow() : fadeOut(),

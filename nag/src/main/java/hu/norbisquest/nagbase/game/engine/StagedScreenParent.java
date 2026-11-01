@@ -13,8 +13,9 @@ public final class StagedScreenParent implements ScreenParent {
     private final FlowPanel stagingParent;
     private final ScreenContext context;
     private final ScreenCreationCallback callback;
+    private final ScreenCreationCompletion completion =
+            new ScreenCreationCompletion();
     private ResourceScope buildingScope = new ResourceScope();
-    private boolean completed;
 
     public StagedScreenParent(FlowPanel activeParent, ScreenContext context,
                               ScreenCreationCallback callback) {
@@ -37,7 +38,7 @@ public final class StagedScreenParent implements ScreenParent {
 
     @Override
     public <T extends Destroyable> T register(T resource) {
-        if (completed || buildingScope == null) {
+        if (completion.isCompleted() || buildingScope == null) {
             throw new IllegalStateException("Screen construction is complete");
         }
 
@@ -52,10 +53,7 @@ public final class StagedScreenParent implements ScreenParent {
 
     @Override
     public void onScreenCreated(GameScreen screen) {
-        if (completed) {
-            if (screen != null) {
-                screen.destroy();
-            }
+        if (completion.discardIfCompleted(screen)) {
             return;
         }
         if (screen == null) {
@@ -72,16 +70,15 @@ public final class StagedScreenParent implements ScreenParent {
         }
         ResourceScope screenScope = buildingScope;
         buildingScope = null;
-        completed = true;
+        completion.accept(screen);
         callback.onSuccess(new CreatedScreen(screen, screenScope));
     }
 
     @Override
     public void onScreenCreationFailed(Throwable cause) {
-        if (completed) {
+        if (!completion.fail()) {
             return;
         }
-        completed = true;
         stagingParent.clear();
 
         Throwable failure = cause != null ? cause

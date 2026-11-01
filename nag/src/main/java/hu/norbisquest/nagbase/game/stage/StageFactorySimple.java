@@ -1,12 +1,12 @@
 package hu.norbisquest.nagbase.game.stage;
 
 import hu.norbisquest.nagbase.common.engine.CommandProcessor;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.game.StageFactory;
 import hu.norbisquest.nagbase.common.game.target.HotSpotContainer;
 import hu.norbisquest.nagbase.common.game.target.Target;
 import hu.norbisquest.nagbase.game.Actor;
 import hu.norbisquest.nagbase.game.HotSpotContainerSimple;
-import hu.norbisquest.nagbase.game.Stage;
 import hu.norbisquest.nagbase.game.command.CommandProcessorSimple;
 import hu.norbisquest.nagbase.game.command.CommandQueue;
 
@@ -20,7 +20,7 @@ public abstract class StageFactorySimple implements StageFactory {
     }
 
     @Override
-    public HotSpotContainer createHotSpotContainer(Stage.Id id) {
+    public HotSpotContainer createHotSpotContainer(ScreenId id) {
         return new HotSpotContainerSimple(id);
     }
 

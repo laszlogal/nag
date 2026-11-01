@@ -126,6 +126,7 @@ dependencies {
     implementation project(':nqcommon')
     implementation 'org.gwtproject:gwt-user:2.13.1'
     implementation project(':nag')
+    testImplementation 'junit:junit:4.13.2'
 }
 
 gwt {

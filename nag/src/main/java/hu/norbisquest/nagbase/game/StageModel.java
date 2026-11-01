@@ -3,9 +3,9 @@ package hu.norbisquest.nagbase.game;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.resources.client.TextResource;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.core.NAGColor;
 import hu.norbisquest.nagbase.core.NAGObject;
-import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nagbase.game.target.HotSpot;
 import hu.norbisquest.nagbase.game.target.StageItem;
 import hu.norbisquest.nagbase.game.walk.WalkGraphModel;
@@ -19,9 +19,9 @@ public class StageModel extends NAGObject {
 	private static int WIDTH = 640;
 	private static int HEIGHT = 400;
 
-	public Id id;
-	protected Id referer;
-	public Id next;
+	public ScreenId id;
+	protected ScreenId referer;
+	public ScreenId next;
 
 	public ImageResource backround = null;
 	public ImageResource maskTop = null;

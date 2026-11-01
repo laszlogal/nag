@@ -1,7 +1,5 @@
 package hu.norbisquest.nagbase.common.engine;
 
-import hu.norbisquest.nagbase.game.Stage;
-
 public interface ScreenNavigation {
     /**
      * Loads a new screen with the given id. Implement this interface
@@ -11,7 +9,7 @@ public interface ScreenNavigation {
      * @param id
      *            The next screen id.
      */
-    void navigateTo(Stage.Id id);
+    void navigateTo(ScreenId id);
 
-    void navigateTo(Stage.Id id, boolean clear);
+    void navigateTo(ScreenId id, boolean clear);
 }

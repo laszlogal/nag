@@ -3,21 +3,22 @@ package hu.norbisquest.nqcommon.client;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FlowPanel;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.core.layer.EventLayerListener;
 import hu.norbisquest.nagbase.core.layer.ImageLayer;
 import hu.norbisquest.nagbase.core.layer.Layer;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Screen;
-import hu.norbisquest.nagbase.game.Stage.Id;
 
 public class Splash extends Screen implements EventLayerListener {
 	private int timer;
-	private int hold;
-	private int fadeOut;
-	private Id next;
+	private final int hold;
+	private final int fadeOut;
+	private final ScreenId next;
 	private boolean clear;
+
 	protected Splash(FlowPanel parent, ImageResource res, int hold, int fadeOut,
-                     Id next) {
+                     ScreenId next) {
 		super(App.LEFT, App.TOP, App.WIDTH, App.HEIGHT, parent);
 		if (res != null) {
 			setBackground(new ImageLayer(res, Layer.Z_BACKGROUND));
@@ -44,8 +45,9 @@ public class Splash extends Screen implements EventLayerListener {
 
 	@Override
 	public void onClick(int x, int y) {
-
 	}
+
+
 
 	@Override
 	public void update(double timestamp) {
@@ -82,8 +84,6 @@ public class Splash extends Screen implements EventLayerListener {
 
 	@Override
 	public void onKeyDown(KeyDownEvent event) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

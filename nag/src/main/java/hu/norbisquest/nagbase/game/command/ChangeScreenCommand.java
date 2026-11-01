@@ -1,14 +1,14 @@
 package hu.norbisquest.nagbase.game.command;
 
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
-import hu.norbisquest.nagbase.game.Stage.Id;
 
 public class ChangeScreenCommand extends OneShotCommand {
 
-	private Id screenId;
+	private ScreenId screenId;
 	private ScreenNavigation listener;
     
-	ChangeScreenCommand(Id screenId, ScreenNavigation listener) {
+	ChangeScreenCommand(ScreenId screenId, ScreenNavigation listener) {
 		this.screenId = screenId;
 		this.listener = listener;
 	}

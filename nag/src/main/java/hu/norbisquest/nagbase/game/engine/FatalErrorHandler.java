@@ -1,8 +1,8 @@
 package hu.norbisquest.nagbase.game.engine;
 
-import hu.norbisquest.nagbase.game.Stage;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 
 @FunctionalInterface
 public interface FatalErrorHandler {
-    void show(Stage.Id failedScreen, Throwable cause);
+    void show(ScreenId failedScreen, Throwable cause);
 }

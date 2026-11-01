@@ -2,6 +2,7 @@ package hu.norbisquest.nq1.client.game.stages;
 
 import com.google.gwt.resources.client.ImageResource;
 import hu.norbisquest.nagbase.common.engine.Command;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.game.StageFactory;
 import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.core.IAudioChannel;
@@ -361,7 +362,7 @@ public class S06BusStop extends NQ1Stage {
 		walkOnFloor();
 		getStageItem(BusStop.HotSpots.FRONT_DOOR).setVisible(false);
 		getStageItem(BusStop.HotSpots.BACK_DOOR).setVisible(false);
-		Id referer = NQ1Settings.get().getReferer();
+		ScreenId referer = NQ1Settings.get().getReferer();
 		if (referer == NQ1Ids.BusFront) {
 			busCommand = new BusToRockKlubCommand();
 			addCommand(Norbi.Cmd.putTo("C"));

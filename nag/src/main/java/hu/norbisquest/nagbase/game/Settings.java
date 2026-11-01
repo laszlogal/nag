@@ -2,8 +2,8 @@ package hu.norbisquest.nagbase.game;
 
 import com.google.gwt.json.client.*;
 import com.google.gwt.storage.client.Storage;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.core.NAGObject;
-import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nagbase.game.conversation.Conversation;
 import hu.norbisquest.nagbase.game.target.ActorTarget;
 import hu.norbisquest.nagbase.game.target.HotSpot;
@@ -18,7 +18,7 @@ public abstract class Settings extends NAGObject {
 		Full
 	}
 
-	private Id startId;
+	private ScreenId startId;
     private String apiVersion;
 
 	public static String getJsonKeyRegistry() {
@@ -123,10 +123,10 @@ public abstract class Settings extends NAGObject {
 		Text, Audio, TextAndAudio
 	}
 
-	private Id screenId;
-	private Id refererId;
+	private ScreenId screenId;
+	private ScreenId refererId;
 	private String language;
-	private Set<Id> visitedIds;
+	private Set<ScreenId> visitedIds;
 	private SpeechMode speechMode;
 	private int textSpeed;
 	private int screenWidth;
@@ -135,8 +135,8 @@ public abstract class Settings extends NAGObject {
 	private Storage storage;
 	private List<ActorTarget> actors;
 	private List<Hero> heroes = new ArrayList<>();
-	private Map<Id, HashMap<HotSpot.Id, Integer>> hotSpotStates;
-	private Map<Id, HashMap<HotSpot.Id, Boolean>>  stageItemsVisibility;
+	private Map<ScreenId, HashMap<HotSpot.Id, Integer>> hotSpotStates;
+	private Map<ScreenId, HashMap<HotSpot.Id, Boolean>>  stageItemsVisibility;
 	private Map<String, List<String>> conversationStates = new HashMap<>();
 	private SettingsChanged listener;
 	private boolean loaded = false;
@@ -210,11 +210,11 @@ public abstract class Settings extends NAGObject {
 	 *
 	 * @return The current screen Id the game displays
 	 */
-	public Id getScreenId() {
+	public ScreenId getScreenId() {
 		return screenId;
 	}
 
-	public void setScreenId(Id currentScreen) {
+	public void setScreenId(ScreenId currentScreen) {
 		this.screenId = currentScreen;
 	}
 
@@ -222,21 +222,21 @@ public abstract class Settings extends NAGObject {
 	 *
 	 * @return The screen Id that the user came from
 	 */
-	public Id getReferer() {
+	public ScreenId getReferer() {
 		return refererId;
 	}
 
-	public void setReferer(Id referer) {
+	public void setReferer(ScreenId referer) {
 		this.refererId = referer;
 		visit(referer);
 	}
 
-	private void visit(Id id) {
+	private void visit(ScreenId id) {
 		visitedIds.add(id);
 		App.debug("Screens visited: " + visitedIds);
 	}
 
-	private boolean isVisited(Id id) {
+	private boolean isVisited(ScreenId id) {
 		boolean result = visitedIds.contains(id);
 		App.debug(id + " visited: " + result);
 		return result;
@@ -272,7 +272,7 @@ public abstract class Settings extends NAGObject {
 		this.textSpeed = textSpeed;
 	}
 
-	void saveHotSpot(Id id, HotSpot hotSpot) {
+	void saveHotSpot(ScreenId id, HotSpot hotSpot) {
 		int controlIdx = hotSpot.getControlIndex();
 		if (controlIdx != 0) {
 			// Do not save the default value.
@@ -296,7 +296,7 @@ public abstract class Settings extends NAGObject {
 		}
 	}
 
-	public void restoreHotSpot(Id id, HotSpot hotSpot) {
+	public void restoreHotSpot(ScreenId id, HotSpot hotSpot) {
 
 		HashMap<HotSpot.Id, Integer> roomMap = hotSpotStates.get(id);
 		if (roomMap != null && roomMap.containsKey(hotSpot.getId())) {
@@ -306,7 +306,7 @@ public abstract class Settings extends NAGObject {
 		}
 	}
 
-	public void restoreStageItem(Id id, StageItem item) {
+	public void restoreStageItem(ScreenId id, StageItem item) {
 		App.debug("[Hotspot] Restoring stage item " + item);
 		HashMap<HotSpot.Id, Boolean> roomMap = stageItemsVisibility.get(id);
 		App.debug("[Hotspot] Room map " + roomMap + " id: " + id);
@@ -356,7 +356,7 @@ public abstract class Settings extends NAGObject {
 
 	private JSONArray visitedToJSON() {
         JSONArray array = new JSONArray();
-        for (Id id : visitedIds) {
+        for (ScreenId id : visitedIds) {
             if (id != null) {
                 array.set(array.size(), new JSONString(id.toString()));
             }
@@ -366,7 +366,7 @@ public abstract class Settings extends NAGObject {
 
     private JSONObject hotSpotsToJSON() {
         JSONObject obj = new JSONObject();
-        for (Id id : hotSpotStates.keySet()) {
+        for (ScreenId id : hotSpotStates.keySet()) {
             JSONObject stage = new JSONObject();
             HashMap<HotSpot.Id, Integer> v = hotSpotStates.get(id);
             for (HotSpot.Id hotSpotId : v.keySet()) {
@@ -381,7 +381,7 @@ public abstract class Settings extends NAGObject {
     private JSONObject stageItemsToJSON() {
         JSONObject obj = new JSONObject();
 
-        for (Id id : stageItemsVisibility.keySet()) {
+        for (ScreenId id : stageItemsVisibility.keySet()) {
             JSONObject items = new JSONObject();
             HashMap<HotSpot.Id, Boolean> si = stageItemsVisibility.get(id);
             App.debug("[SETTINGS] map: " + si);
@@ -448,19 +448,19 @@ public abstract class Settings extends NAGObject {
 
     private void parseCurrentScreen(JSONObject api) {
         JSONString screen = api.isObject().get(JSON_KEY_CURRENT_SCREEN).isString();
-        screenId = createStageId(screen.stringValue());
+        screenId = parseScreenId(screen.stringValue());
     }
 
     private void parseReferer(JSONObject api) {
         JSONString referer = api.isObject().get(JSON_KEY_REFERER).isString();
-        refererId = createStageId(referer.stringValue());
+        refererId = parseScreenId(referer.stringValue());
     }
 
     private void parseVisitedIds(JSONObject api) {
         JSONArray visited = api.isObject().get(JSON_KEY_VISITED).isArray();
         visitedIds.clear();
         for (int i = 0; i < visited.size(); i++) {
-            visitedIds.add(createStageId(visited.get(i).isString().stringValue()));
+            visitedIds.add(parseScreenId(visited.get(i).isString().stringValue()));
         }
         visitedIds.add(getScreenId());
     }
@@ -470,7 +470,7 @@ public abstract class Settings extends NAGObject {
 		if (hotspots.isObject() != null) {
 			hotSpotStates.clear();
 			for (String stage : hotspots.keySet()) {
-				Stage.Id stageId = createStageId(stage);
+				ScreenId stageId = parseScreenId(stage);
 				JSONObject items = hotspots.get(stage).isObject();
 				HashMap<HotSpot.Id, Integer> stateMap = new HashMap<>();
 				for (String name : items.keySet()) {
@@ -489,7 +489,7 @@ public abstract class Settings extends NAGObject {
         if (visibility.isObject() != null) {
             stageItemsVisibility.clear();
             for (String stage : visibility.keySet()) {
-                Stage.Id stageId = createStageId(stage);
+                ScreenId stageId = parseScreenId(stage);
                 JSONObject items = visibility.get(stage).isObject();
                 HashMap<HotSpot.Id, Boolean> visibleMap = new HashMap<>();
                 for (String name : items.keySet()) {
@@ -563,9 +563,9 @@ public abstract class Settings extends NAGObject {
         log("parsing FINISHED");
     }
 
-	protected abstract Stage.Id createStageId(String name);
+	protected abstract ScreenId parseScreenId(String name);
 
-	protected abstract HotSpot.Id createHotSpotId(Stage.Id id, String name);
+	protected abstract HotSpot.Id createHotSpotId(ScreenId id, String name);
 
 	// protected abstract JSONObject getCustomJSON();
 
@@ -657,11 +657,11 @@ public abstract class Settings extends NAGObject {
 		this.inventoryFill = inventoryFill;
 	}
 
-	public Id getStartId() {
+	public ScreenId getStartId() {
 		return startId;
 	}
 
-	public void setStartId(Id startId) {
+	public void setStartId(ScreenId startId) {
 		this.startId = startId;
 	}
 

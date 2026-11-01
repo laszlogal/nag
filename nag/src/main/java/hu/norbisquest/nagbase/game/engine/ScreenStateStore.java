@@ -1,7 +1,7 @@
 package hu.norbisquest.nagbase.game.engine;
 
-import hu.norbisquest.nagbase.game.Stage;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 
 public interface ScreenStateStore {
-    void commit(Stage.Id referer, Stage.Id current);
+    void commit(ScreenId referer, ScreenId current);
 }

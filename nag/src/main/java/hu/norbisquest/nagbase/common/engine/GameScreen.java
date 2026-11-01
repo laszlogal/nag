@@ -1,10 +1,9 @@
 package hu.norbisquest.nagbase.common.engine;
 
 import hu.norbisquest.nagbase.core.Destroyable;
-import hu.norbisquest.nagbase.game.Stage;
 
 public interface GameScreen extends Destroyable {
-    Stage.Id getId();
+    ScreenId getId();
 
     void attach(ScreenContext context);
 

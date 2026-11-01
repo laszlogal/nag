@@ -1,9 +1,8 @@
 package hu.norbisquest.nq1.client;
 
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Settings;
-import hu.norbisquest.nagbase.game.Stage;
-import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nq1.client.data.bundle.Room;
 import hu.norbisquest.nq1.client.data.model.InventoryModel;
 import hu.norbisquest.nq1.client.data.model.InventoryModel.Ids;
@@ -339,12 +338,12 @@ public class NQ1Settings extends Settings {
 	}
 
 	@Override
-	protected Id createStageId(String name) {
+	protected ScreenId parseScreenId(String name) {
 		return name == null || "".equals(name) ? null : NQ1Ids.valueOf(name);
 	}
 
 	@Override
-	protected hu.norbisquest.nagbase.game.target.HotSpot.Id createHotSpotId(Stage.Id id, String name) {
+	protected hu.norbisquest.nagbase.game.target.HotSpot.Id createHotSpotId(ScreenId id, String name) {
 		// TODO Auto-generated method stub
 		NQ1Ids stageId = (NQ1Ids) id;
 		switch (stageId) {

@@ -1,8 +1,8 @@
 package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
-import hu.norbisquest.nagbase.game.Stage;
 
 /** Coordinates the game's single in-flight screen transition. */
 public final class ScreenCoordinator implements ScreenNavigation {
@@ -34,12 +34,12 @@ public final class ScreenCoordinator implements ScreenNavigation {
     }
 
     @Override
-    public void navigateTo(Stage.Id id) {
+    public void navigateTo(ScreenId id) {
         navigateTo(id, true);
     }
 
     @Override
-    public void navigateTo(final Stage.Id id, final boolean clear) {
+    public void navigateTo(final ScreenId id, final boolean clear) {
         if (state != State.READY) {
             return;
         }
@@ -96,7 +96,7 @@ public final class ScreenCoordinator implements ScreenNavigation {
         state = State.STOPPED;
     }
 
-    private void accept(Stage.Id id, boolean clear, StagedScreen next) {
+    private void accept(ScreenId id, boolean clear, StagedScreen next) {
         if (state != State.LOADING) {
             destroy(next, null);
             return;
@@ -117,7 +117,7 @@ public final class ScreenCoordinator implements ScreenNavigation {
             }
 
             GameScreen previous = host.getScreen();
-            Stage.Id referer = previous == null ? null : previous.getId();
+            ScreenId referer = previous == null ? null : previous.getId();
 
             next.activate(clear);
             host.replaceScreen(next);
@@ -131,7 +131,7 @@ public final class ScreenCoordinator implements ScreenNavigation {
         }
     }
 
-    private void failFatally(Stage.Id id, Throwable cause) {
+    private void failFatally(ScreenId id, Throwable cause) {
         if (state == State.STOPPED) {
             return;
         }

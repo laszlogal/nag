@@ -2,8 +2,8 @@ package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
 import hu.norbisquest.nagbase.common.engine.ScreenContext;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
-import hu.norbisquest.nagbase.game.Stage;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -153,14 +153,9 @@ public class ScreenCoordinatorTest {
                 factory, host, stateStore, failures);
     }
 
-    private enum TestId implements Stage.Id {
+    private enum TestId implements ScreenId {
         ROOM,
-        CORRIDOR;
-
-        @Override
-        public Stage.Id toId(String name) {
-            return valueOf(name);
-        }
+        CORRIDOR
     }
 
     private static final class ManualScreenFactory implements ScreenFactory {
@@ -168,7 +163,7 @@ public class ScreenCoordinatorTest {
         private final List<ScreenNavigation> navigations = new ArrayList<>();
 
         @Override
-        public void create(Stage.Id id, ScreenNavigation navigation,
+        public void create(ScreenId id, ScreenNavigation navigation,
                            ScreenCreationCallback callback) {
             navigations.add(navigation);
             callbacks.add(callback);
@@ -190,7 +185,7 @@ public class ScreenCoordinatorTest {
         private boolean clearCurrentContent;
         private RuntimeException activationFailure;
 
-        private FakeStagedScreen(Stage.Id id) {
+        private FakeStagedScreen(ScreenId id) {
             screen = new FakeScreen(id);
         }
 
@@ -255,41 +250,41 @@ public class ScreenCoordinatorTest {
         private final List<Commit> commits = new ArrayList<>();
 
         @Override
-        public void commit(Stage.Id referer, Stage.Id current) {
+        public void commit(ScreenId referer, ScreenId current) {
             commits.add(new Commit(referer, current));
         }
     }
 
     private static final class RecordingFatalErrorHandler
             implements FatalErrorHandler {
-        private final List<Stage.Id> ids = new ArrayList<>();
+        private final List<ScreenId> ids = new ArrayList<>();
         private final List<Throwable> causes = new ArrayList<>();
 
         @Override
-        public void show(Stage.Id failedScreen, Throwable cause) {
+        public void show(ScreenId failedScreen, Throwable cause) {
             ids.add(failedScreen);
             causes.add(cause);
         }
     }
 
     private static final class Commit {
-        private final Stage.Id referer;
-        private final Stage.Id current;
+        private final ScreenId referer;
+        private final ScreenId current;
 
-        private Commit(Stage.Id referer, Stage.Id current) {
+        private Commit(ScreenId referer, ScreenId current) {
             this.referer = referer;
             this.current = current;
         }
     }
 
     private static final class FakeScreen implements GameScreen {
-        private final Stage.Id id;
+        private final ScreenId id;
         private boolean destroyed;
         private boolean loadResult = true;
         private int loadCount;
         private ScreenContext context;
 
-        private FakeScreen(Stage.Id id) {
+        private FakeScreen(ScreenId id) {
             this.id = id;
         }
 
@@ -312,7 +307,7 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public Stage.Id getId() {
+        public ScreenId getId() {
             return id;
         }
 

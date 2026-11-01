@@ -7,8 +7,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.game.App;
-import hu.norbisquest.nagbase.game.Stage;
 
 /** Displays a terminal error without loading another game screen. */
 public final class GwtFatalErrorHandler implements FatalErrorHandler {
@@ -28,7 +28,7 @@ public final class GwtFatalErrorHandler implements FatalErrorHandler {
     }
 
     @Override
-    public void show(Stage.Id failedScreen, Throwable cause) {
+    public void show(ScreenId failedScreen, Throwable cause) {
         gameLoop.stop();
 
         Throwable failure = cause != null ? cause

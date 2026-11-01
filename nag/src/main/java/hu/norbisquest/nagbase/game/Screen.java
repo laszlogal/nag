@@ -5,11 +5,11 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FlowPanel;
 import hu.norbisquest.nagbase.common.engine.GameScreen;
 import hu.norbisquest.nagbase.common.engine.ScreenContext;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
 import hu.norbisquest.nagbase.common.gui.ScreenDimension;
 import hu.norbisquest.nagbase.core.layer.*;
-import hu.norbisquest.nagbase.game.Stage.Id;
 import hu.norbisquest.nagbase.game.engine.ScreenParent;
 
 public abstract class Screen extends MultiLayer implements GameScreen {
@@ -26,7 +26,7 @@ public abstract class Screen extends MultiLayer implements GameScreen {
 	private static Layer debugLayer;
 
 	private ScreenContext context;
-	private Id id;
+	private ScreenId id;
 	private int zBase;
 
 	Screen(){}
@@ -216,7 +216,7 @@ public abstract class Screen extends MultiLayer implements GameScreen {
 	 * @return The unique screen identifier.
 	 */
 	@Override
-	public Id getId() {
+	public ScreenId getId() {
 		return id;
 	}
 
@@ -227,7 +227,7 @@ public abstract class Screen extends MultiLayer implements GameScreen {
 	 * @param id
 	 *            The unique screen identifier.
 	 */
-    protected void setId(Id id) {
+    protected void setId(ScreenId id) {
 		this.id = id;
 	}
 

@@ -1,16 +1,15 @@
 package hu.norbisquest.nagbase.game.target;
 
 import com.google.gwt.resources.client.ImageResource;
-
-import hu.norbisquest.nagbase.game.Stage;
+import hu.norbisquest.nagbase.common.engine.ScreenId;
 
 public class ItemResource {
 	public class PositionInStage {
-		Stage.Id stageId;
+		ScreenId stageId;
 		double x;
 		double y;
 		int zIndex;
-		PositionInStage(Stage.Id id, double x, double y, int zIndex) {
+		PositionInStage(ScreenId id, double x, double y, int zIndex) {
 			this.stageId = id;
 			this.x = x;
 			this.y = y;
@@ -27,7 +26,7 @@ public class ItemResource {
 	public int cursorHotSpotX = 0;
 	public int cursorHotSpotY = 0;
 
-	void addPositionInStage(Stage.Id id, double x, double y, int zIndex) {
+	void addPositionInStage(ScreenId id, double x, double y, int zIndex) {
         PositionInStage posInStage = new PositionInStage(id, x, y, zIndex);
 	}
 }
