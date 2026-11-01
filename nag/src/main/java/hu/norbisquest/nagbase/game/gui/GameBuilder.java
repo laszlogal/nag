@@ -30,7 +30,19 @@ public abstract class GameBuilder {
         App.getInventory().setFactory(getItemFactory());
 
         gui = createGui(createDialogManager());
-        GameDisplay display = new GameDisplay();
+        GameDisplay display = new GameDisplay(effect -> {
+            switch (effect) {
+                case FADE_IN:
+                    App.setRootStyle("fade-in");
+                    break;
+                case SEAMLESS:
+                    App.setRootStyle("screen-visible");
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                            "Unsupported transition effect: " + effect);
+            }
+        });
         ScreenFactory screenFactory = createScreenFactory(gui);
         GameLoop gameLoop = new GameLoop(display, new GwtFrameScheduler(), fps);
         ScreenCoordinator coordinator = new ScreenCoordinator(

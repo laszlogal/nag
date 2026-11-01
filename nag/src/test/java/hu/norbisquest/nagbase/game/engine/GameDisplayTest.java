@@ -3,8 +3,12 @@ package hu.norbisquest.nagbase.game.engine;
 import hu.norbisquest.nagbase.common.engine.GameScreen;
 import hu.norbisquest.nagbase.common.engine.ScreenContext;
 import hu.norbisquest.nagbase.common.engine.ScreenId;
+import hu.norbisquest.nagbase.common.engine.TransitionEffect;
 import hu.norbisquest.nagbase.core.ResourceScope;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -12,14 +16,15 @@ public class GameDisplayTest {
 
     @Test
     public void replacementKeepsIncomingScreenAndDestroysPreviousScreen() {
-        GameDisplay display = new GameDisplay();
+        List<TransitionEffect> effects = new ArrayList<>();
+        GameDisplay display = new GameDisplay(effects::add);
         FakeScreen first = new FakeScreen();
         FakeScreen second = new FakeScreen();
         FakeStagedScreen firstStaged = staged(first);
         FakeStagedScreen secondStaged = staged(second);
 
-        display.replaceScreen(firstStaged);
-        display.replaceScreen(secondStaged);
+        display.replaceScreen(firstStaged, TransitionEffect.FADE_IN);
+        display.replaceScreen(secondStaged, TransitionEffect.SEAMLESS);
 
         assertTrue(firstStaged.isDestroyed());
         assertEquals(1, first.destroyCount);
@@ -28,6 +33,7 @@ public class GameDisplayTest {
 
         display.update(1.0);
         assertEquals(1, second.showCount);
+        assertEquals(List.of(TransitionEffect.SEAMLESS), effects);
 
         display.destroy();
         assertTrue(secondStaged.isDestroyed());
@@ -48,9 +54,9 @@ public class GameDisplayTest {
 
     @Test
     public void transitionPausesOutgoingScreenUntilReplacement() {
-        GameDisplay display = new GameDisplay();
+        GameDisplay display = new GameDisplay(effect -> { });
         FakeScreen outgoing = new FakeScreen();
-        display.replaceScreen(staged(outgoing));
+        display.replaceScreen(staged(outgoing), TransitionEffect.FADE_IN);
         display.update(1.0);
         display.update(2.0);
         assertEquals(1, outgoing.executeCount);
@@ -61,12 +67,32 @@ public class GameDisplayTest {
         assertEquals(1, outgoing.executeCount);
 
         FakeScreen incoming = new FakeScreen();
-        display.replaceScreen(staged(incoming));
+        display.replaceScreen(staged(incoming), TransitionEffect.FADE_IN);
         display.update(4.0);
         display.update(5.0);
         assertEquals(1, incoming.showCount);
         assertEquals(1, incoming.executeCount);
         assertTrue(incoming.inputEnabled);
+    }
+
+    @Test
+    public void transitionIsPresentedOnlyWhenScreenEnters() {
+        List<TransitionEffect> effects = new ArrayList<>();
+        GameDisplay display = new GameDisplay(effects::add);
+        FakeScreen incoming = new FakeScreen();
+        incoming.ready = false;
+
+        display.replaceScreen(staged(incoming), TransitionEffect.SEAMLESS);
+        display.update(1.0);
+
+        assertTrue(effects.isEmpty());
+        assertEquals(0, incoming.showCount);
+
+        incoming.ready = true;
+        display.update(2.0);
+
+        assertEquals(List.of(TransitionEffect.SEAMLESS), effects);
+        assertEquals(1, incoming.showCount);
     }
 
     private FakeStagedScreen staged(FakeScreen screen) {
@@ -91,7 +117,7 @@ public class GameDisplayTest {
         }
 
         @Override
-        public void activate(boolean clearCurrentContent) {
+        public void activate() {
         }
 
         @Override
@@ -115,6 +141,7 @@ public class GameDisplayTest {
         private int showCount;
         private int executeCount;
         private boolean inputEnabled = true;
+        private boolean ready = true;
         private ScreenContext context;
 
         @Override
@@ -134,7 +161,7 @@ public class GameDisplayTest {
 
         @Override
         public boolean isReady() {
-            return !destroyed;
+            return ready && !destroyed;
         }
 
         @Override

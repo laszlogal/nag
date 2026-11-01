@@ -20,8 +20,6 @@ public class Layer extends NAGCanvas implements  ILayer {
 	private int top;
 	private String id;
 
-	private boolean permanent=false;
-
 	public Layer() {
 	}
 	public void setSize(int width, int height) {
@@ -81,11 +79,4 @@ public class Layer extends NAGCanvas implements  ILayer {
 		return result;
 	}
 
-	boolean isPermanent() {
-		return permanent;
-	}
-
-	public void setPermanent(boolean permanent) {
-		this.permanent = permanent;
-	}
 }

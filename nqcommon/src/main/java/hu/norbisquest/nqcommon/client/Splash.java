@@ -4,6 +4,7 @@ import com.google.gwt.event.dom.client.*;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FlowPanel;
 import hu.norbisquest.nagbase.common.engine.ScreenId;
+import hu.norbisquest.nagbase.common.engine.TransitionEffect;
 import hu.norbisquest.nagbase.core.layer.EventLayerListener;
 import hu.norbisquest.nagbase.core.layer.ImageLayer;
 import hu.norbisquest.nagbase.core.layer.Layer;
@@ -15,7 +16,6 @@ public class Splash extends Screen implements EventLayerListener {
 	private final int hold;
 	private final int fadeOut;
 	private final ScreenId next;
-	private boolean clear;
 
 	protected Splash(FlowPanel parent, ImageResource res, int hold, int fadeOut,
                      ScreenId next) {
@@ -32,7 +32,6 @@ public class Splash extends Screen implements EventLayerListener {
 	@Override
 	protected void onAvailable(boolean isFirst) {
 		super.onAvailable(isFirst);
-		App.setRootStyle("fade-in");
 		timer = 0;
 	}
 
@@ -52,18 +51,25 @@ public class Splash extends Screen implements EventLayerListener {
 	@Override
 	public void update(double timestamp) {
 		timer++;
-		if (timer == hold) {
-			if (fadeOut != -1) {
-				App.setRootStyle("fade-out-slow");
+		if (fadeOut < 0 && timer == hold) {
+			onFadeOut();
+		} else if (fadeOut >= 0 && timer == hold) {
+			App.setRootStyle("fade-out-slow");
+			if (fadeOut == 0) {
+				onFadeOut();
 			}
-		} else if (timer == hold + fadeOut) {
+		} else if (fadeOut >= 0 && timer == hold + fadeOut) {
 			onFadeOut();
 		}
 	}
 
 	protected void onFadeOut() {
-		getListener().navigateTo(next, isClear());
+		getListener().navigateTo(next, getTransitionEffect());
 
+	}
+
+	protected TransitionEffect getTransitionEffect() {
+		return TransitionEffect.FADE_IN;
 	}
 
 	@Override
@@ -90,14 +96,6 @@ public class Splash extends Screen implements EventLayerListener {
 	public void onContextMenu(ContextMenuEvent event) {
 		// TODO Auto-generated method stub
 
-	}
-
-	private boolean isClear() {
-		return clear;
-	}
-
-	protected void setClear(boolean clear) {
-		this.clear = clear;
 	}
 
 	@Override

@@ -184,10 +184,7 @@ public class MultiLayer extends NAGObject implements Loadable {
 	@Override
 	public final void destroyCore() {
 		for (Layer layer : layerMap.values()) {
-			if (!layer.isPermanent()) {
-				layer.destroy();
-				layer = null;
-			}
+			layer.destroy();
 		}
 		layerMap.clear();
 		layerMap = null;

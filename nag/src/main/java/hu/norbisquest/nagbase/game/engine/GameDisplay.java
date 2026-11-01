@@ -1,6 +1,7 @@
 package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
+import hu.norbisquest.nagbase.common.engine.TransitionEffect;
 import hu.norbisquest.nagbase.core.NAGObject;
 import hu.norbisquest.nagbase.game.Stage;
 
@@ -10,11 +11,18 @@ import java.util.List;
 public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
 
     private StagedScreen stagedScreen;
+    private final ScreenTransitionPresenter transitionPresenter;
+    private TransitionEffect transitionEffect;
     private boolean changed;
     private boolean paused;
     private final List<ChangeScreen> changeHandlers = new ArrayList<>();
 
-    public GameDisplay() {
+    public GameDisplay(ScreenTransitionPresenter transitionPresenter) {
+        if (transitionPresenter == null) {
+            throw new IllegalArgumentException(
+                    "transitionPresenter must not be null");
+        }
+        this.transitionPresenter = transitionPresenter;
         changed = false;
     }
 
@@ -31,6 +39,7 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
             return;
         }
         if (isScreenChanged()) {
+            transitionPresenter.present(transitionEffect);
             currentScreen().enter();
             changed = false;
         } else {
@@ -61,6 +70,7 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     protected void doDestroy() {
         StagedScreen current = stagedScreen;
         stagedScreen = null;
+        transitionEffect = null;
         changed = false;
         if (current != null) {
             current.destroy();
@@ -107,16 +117,20 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     }
 
     @Override
-    public void replaceScreen(StagedScreen screen) {
+    public void replaceScreen(StagedScreen screen, TransitionEffect effect) {
         if (screen == null) {
             throw new IllegalArgumentException("Staged screen must not be null");
         }
         if (screen.isDestroyed()) {
             throw new IllegalArgumentException("Staged screen is already destroyed");
         }
+        if (effect == null) {
+            throw new IllegalArgumentException("Transition effect must not be null");
+        }
 
         StagedScreen previous = stagedScreen;
         stagedScreen = screen;
+        transitionEffect = effect;
         paused = false;
         GameScreen gameScreen = screen.getScreen();
         try {

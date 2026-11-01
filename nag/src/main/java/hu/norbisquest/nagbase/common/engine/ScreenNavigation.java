@@ -11,5 +11,5 @@ public interface ScreenNavigation {
      */
     void navigateTo(ScreenId id);
 
-    void navigateTo(ScreenId id, boolean clear);
+    void navigateTo(ScreenId id, TransitionEffect effect);
 }

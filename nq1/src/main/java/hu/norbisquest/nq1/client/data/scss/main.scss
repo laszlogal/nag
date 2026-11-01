@@ -51,6 +51,11 @@ canvas {
 	opacity:0;
 }
 
+.screen-visible {
+	transition: none;
+	opacity: 1;
+}
+
 #main {
 	position: absolute;
 	top: 0px;

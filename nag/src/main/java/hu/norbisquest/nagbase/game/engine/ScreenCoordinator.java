@@ -3,6 +3,7 @@ package hu.norbisquest.nagbase.game.engine;
 import hu.norbisquest.nagbase.common.engine.GameScreen;
 import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
+import hu.norbisquest.nagbase.common.engine.TransitionEffect;
 
 /** Coordinates the game's single in-flight screen transition. */
 public final class ScreenCoordinator implements ScreenNavigation {
@@ -35,17 +36,22 @@ public final class ScreenCoordinator implements ScreenNavigation {
 
     @Override
     public void navigateTo(ScreenId id) {
-        navigateTo(id, true);
+        navigateTo(id, TransitionEffect.FADE_IN);
     }
 
     @Override
-    public void navigateTo(final ScreenId id, final boolean clear) {
+    public void navigateTo(final ScreenId id, final TransitionEffect effect) {
         if (state != State.READY) {
             return;
         }
         if (id == null) {
             failFatally(null, new IllegalArgumentException(
                     "Screen id must not be null"));
+            return;
+        }
+        if (effect == null) {
+            failFatally(id, new IllegalArgumentException(
+                    "Transition effect must not be null"));
             return;
         }
         state = State.LOADING;
@@ -65,7 +71,7 @@ public final class ScreenCoordinator implements ScreenNavigation {
                     }
                     completed = true;
                     accepted = screen;
-                    accept(id, clear, screen);
+                    accept(id, effect, screen);
                 }
 
                 @Override
@@ -96,7 +102,7 @@ public final class ScreenCoordinator implements ScreenNavigation {
         state = State.STOPPED;
     }
 
-    private void accept(ScreenId id, boolean clear, StagedScreen next) {
+    private void accept(ScreenId id, TransitionEffect effect, StagedScreen next) {
         if (state != State.LOADING) {
             destroy(next, null);
             return;
@@ -119,8 +125,8 @@ public final class ScreenCoordinator implements ScreenNavigation {
             GameScreen previous = host.getScreen();
             ScreenId referer = previous == null ? null : previous.getId();
 
-            next.activate(clear);
-            host.replaceScreen(next);
+            next.activate();
+            host.replaceScreen(next, effect);
             stateStore.commit(referer, id);
             state = State.READY;
         } catch (Throwable cause) {

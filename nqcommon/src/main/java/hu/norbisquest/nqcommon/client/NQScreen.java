@@ -55,12 +55,6 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 	}
 
 	@Override
-	protected void onAvailable(boolean isFirst) {
-		super.onAvailable(isFirst);
-		App.setRootStyle("fade-in");
-	}
-
-	@Override
 	public void onMouseOut(int x, int y) {
 	}
 

@@ -340,16 +340,6 @@ public abstract class NQStage extends Stage {
     }
 
 	@Override
-	public void enter() {
-		super.enter();
-		fadeIn();
-	}
-
-	private void fadeIn() {
-		App.setRootStyle("fade-in");
-	}
-
-	@Override
 	public void onMouseMove(int x, int y) {
 		if (!this.isValid()) {
 			return;

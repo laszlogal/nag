@@ -7,5 +7,5 @@ import hu.norbisquest.nagbase.core.Destroyable;
 public interface StagedScreen extends Destroyable {
     GameScreen getScreen();
 
-    void activate(boolean clearCurrentContent);
+    void activate();
 }

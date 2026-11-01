@@ -1,9 +1,6 @@
 package hu.norbisquest.nagbase.game.engine;
 
-import hu.norbisquest.nagbase.common.engine.GameScreen;
-import hu.norbisquest.nagbase.common.engine.ScreenContext;
-import hu.norbisquest.nagbase.common.engine.ScreenId;
-import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
+import hu.norbisquest.nagbase.common.engine.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -29,7 +26,7 @@ public class ScreenCoordinatorTest {
         assertEquals(1, next.screen.loadCount);
         assertSame(fixture.coordinator, fixture.factory.navigations.get(0));
         assertTrue(next.activated);
-        assertTrue(next.clearCurrentContent);
+        assertEquals(TransitionEffect.FADE_IN, fixture.host.transitionEffect);
         assertEquals(1, fixture.stateStore.commits.size());
         assertEquals(TestId.ROOM, fixture.stateStore.commits.get(0).referer);
         assertEquals(TestId.CORRIDOR, fixture.stateStore.commits.get(0).current);
@@ -48,6 +45,20 @@ public class ScreenCoordinatorTest {
         assertSame(failure, fixture.failures.causes.get(0));
         assertEquals(TestId.CORRIDOR, fixture.failures.ids.get(0));
         assertEquals(0, fixture.stateStore.commits.size());
+    }
+
+    @Test
+    public void nullTransitionEffectFailsBeforeLoadingStarts() {
+        Fixture fixture = new Fixture();
+
+        fixture.coordinator.navigateTo(TestId.CORRIDOR, null);
+
+        assertEquals(ScreenCoordinator.State.STOPPED, fixture.coordinator.getState());
+        assertEquals(0, fixture.host.pauseCount);
+        assertTrue(fixture.factory.callbacks.isEmpty());
+        assertEquals(1, fixture.failures.causes.size());
+        assertTrue(fixture.failures.causes.get(0)
+                instanceof IllegalArgumentException);
     }
 
     @Test
@@ -132,15 +143,16 @@ public class ScreenCoordinatorTest {
     }
 
     @Test
-    public void clearFlagIsPassedToActivation() {
+    public void transitionEffectIsPassedToHost() {
         Fixture fixture = new Fixture();
         FakeStagedScreen next = new FakeStagedScreen(TestId.ROOM);
 
-        fixture.coordinator.navigateTo(TestId.ROOM, false);
+        fixture.coordinator.navigateTo(
+                TestId.ROOM, TransitionEffect.SEAMLESS);
         fixture.factory.succeed(0, next);
 
         assertTrue(next.activated);
-        assertFalse(next.clearCurrentContent);
+        assertEquals(TransitionEffect.SEAMLESS, fixture.host.transitionEffect);
     }
 
     private static final class Fixture {
@@ -182,7 +194,6 @@ public class ScreenCoordinatorTest {
         private final FakeScreen screen;
         private boolean activated;
         private boolean destroyed;
-        private boolean clearCurrentContent;
         private RuntimeException activationFailure;
 
         private FakeStagedScreen(ScreenId id) {
@@ -195,12 +206,11 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public void activate(boolean clearCurrentContent) {
+        public void activate() {
             if (activationFailure != null) {
                 throw activationFailure;
             }
             activated = true;
-            this.clearCurrentContent = clearCurrentContent;
         }
 
         @Override
@@ -222,6 +232,7 @@ public class ScreenCoordinatorTest {
         private StagedScreen current;
         private RuntimeException replaceFailure;
         private int pauseCount;
+        private TransitionEffect transitionEffect;
 
         @Override
         public void pauseScreen() {
@@ -234,12 +245,13 @@ public class ScreenCoordinatorTest {
         }
 
         @Override
-        public void replaceScreen(StagedScreen next) {
+        public void replaceScreen(StagedScreen next, TransitionEffect effect) {
             if (replaceFailure != null) {
                 throw replaceFailure;
             }
             StagedScreen previous = current;
             current = next;
+            transitionEffect = effect;
             if (previous != null) {
                 previous.destroy();
             }

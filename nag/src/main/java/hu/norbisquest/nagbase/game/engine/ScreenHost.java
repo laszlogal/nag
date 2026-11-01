@@ -1,6 +1,8 @@
 package hu.norbisquest.nagbase.game.engine;
 
 import hu.norbisquest.nagbase.common.engine.GameScreen;
+import hu.norbisquest.nagbase.common.engine.TransitionEffect;
+
 public interface ScreenHost {
     GameScreen getScreen();
 
@@ -8,5 +10,5 @@ public interface ScreenHost {
     void pauseScreen();
 
     /** Takes ownership of {@code screen} when invoked. */
-    void replaceScreen(StagedScreen screen);
+    void replaceScreen(StagedScreen screen, TransitionEffect effect);
 }

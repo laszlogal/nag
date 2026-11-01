@@ -116,15 +116,12 @@ public final class StagedScreenParent implements ScreenParent {
         }
 
         @Override
-        public void activate(boolean clearCurrentContent) {
+        public void activate() {
             if (destroyed) {
                 throw new IllegalStateException("Staged screen is destroyed");
             }
             if (activated) {
                 throw new IllegalStateException("Staged screen is already active");
-            }
-            if (clearCurrentContent) {
-                activeParent.clear();
             }
             activeParent.add(stagingParent);
             activated = true;

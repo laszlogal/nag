@@ -54,7 +54,7 @@ public class ScreenContextTest {
             }
 
             @Override
-            public void navigateTo(ScreenId id, boolean clear) {
+            public void navigateTo(ScreenId id, TransitionEffect effect) {
             }
         };
     }
