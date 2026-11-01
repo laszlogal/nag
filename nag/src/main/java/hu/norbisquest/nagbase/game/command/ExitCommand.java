@@ -6,18 +6,18 @@ import hu.norbisquest.nagbase.game.Walker;
 import hu.norbisquest.nagbase.game.target.ExitTarget;
 
 public class ExitCommand extends WalkCommand {
-	private ScreenNavigation listener;
-	private ScreenId exitId;
+	private final ScreenNavigation navigation;
+	private final ScreenId exitId;
 
-	public ExitCommand(Walker walker, ExitTarget exit, ScreenNavigation listener) {
+	public ExitCommand(Walker walker, ExitTarget exit, ScreenNavigation navigation) {
 		super(walker, exit.getLeft(), exit.getTop(), true);
-		this.listener = listener;
+		this.navigation = navigation;
 		exitId = exit.getScreenId();
 	}
 
 	@Override
 	public void onArrive() {
 		super.onArrive();
-		listener.navigateTo(exitId);
+		navigation.navigateTo(exitId);
 	}
 }

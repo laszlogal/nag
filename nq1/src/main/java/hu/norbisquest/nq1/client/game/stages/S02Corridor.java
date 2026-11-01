@@ -84,14 +84,14 @@ public class S02Corridor extends NQ1Stage {
 		super.onRegionEnter(region);
 		if (region.equals("S - ROOM")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.Room,
-					getListener(), false));
+					getNavigation(), false));
 		}
 	}
 
 	@Override
 	public void reload() {
 		addCommandList(Cmd.fadeOutToScreen(NQ1Ids.Room,
-				getListener(), false));
+				getNavigation(), false));
 	}
 
 }

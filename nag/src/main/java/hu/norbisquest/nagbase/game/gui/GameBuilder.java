@@ -51,7 +51,7 @@ public abstract class GameBuilder {
                 new SettingsScreenStateStore(App.getSettings()),
                 new GwtFatalErrorHandler(gui.getContent(), gameLoop, display));
         engine = new Engine(gameLoop, display, coordinator);
-        engine.addChangeScreenHandler(gui);
+        engine.addScreenChangeListener(gui);
         coordinator.navigateTo(App.getSettings().getStartId());
     }
 

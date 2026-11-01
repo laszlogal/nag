@@ -1,10 +1,10 @@
 package hu.norbisquest.nagbase.common.gui;
 
 import com.google.gwt.user.client.ui.Widget;
-import hu.norbisquest.nagbase.game.engine.ChangeScreen;
+import hu.norbisquest.nagbase.game.engine.ScreenChangeListener;
 import hu.norbisquest.nagbase.game.gui.Toolbar;
 
-public interface GameGUI extends ChangeScreen, HasMenu, HasContent, HasZoom {
+public interface GameGUI extends ScreenChangeListener, HasMenu, HasContent, HasZoom {
 
     void add(Widget widget);
 

@@ -229,7 +229,7 @@ public class S03Toilet extends NQ1Stage {
 		super.onRegionEnter(region);
 		if (region.equals("S - ROOM")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.Room,
-					getListener(), false));
+					getNavigation(), false));
 		}
 	}
 }

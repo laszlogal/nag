@@ -172,6 +172,6 @@ public class S11PlayBass extends NQ1Stage {
 				Cmd.playSfx(PlayBass.INSTANCE.ash_sfx(), true),
 				Cmd.fadeOutSlow(),
 				Cmd.pause(100),
-				Cmd.changeScreen(NQ1Ids.Credits, getListener())));
+				Cmd.navigateTo(NQ1Ids.Credits, getNavigation())));
 	}
 }

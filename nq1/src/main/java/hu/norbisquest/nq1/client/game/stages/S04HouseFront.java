@@ -69,7 +69,7 @@ public class S04HouseFront extends NQ1Stage {
 		super.onRegionEnter(region);
 		if (region.equals("B - E")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.NewsStand,
-					getListener(), false));
+					getNavigation(), false));
 		}
 	}
 

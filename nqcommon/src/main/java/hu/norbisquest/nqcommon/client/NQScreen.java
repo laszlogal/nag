@@ -47,7 +47,7 @@ public abstract class NQScreen extends Screen implements EventLayerListener {
 	}
 
 	protected void onFadeOut() {
-		getListener().navigateTo(fadeTo);
+		getNavigation().navigateTo(fadeTo);
 	}
 
 	@Override

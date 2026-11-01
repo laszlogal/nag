@@ -411,7 +411,7 @@ public class S01Room extends NQ1Stage {
 		if (region.equals("G2 - Corridor")) {
 
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.Corridor,
-					getListener(), false));
+					getNavigation(), false));
 		}
 
 		if (region.equals("Y2 - F")) {
@@ -423,7 +423,7 @@ public class S01Room extends NQ1Stage {
 	@Override
 	public void reload() {
 		addCommandList(Cmd.fadeOutToScreen(NQ1Ids.Room,
-				getListener(), false));
+				getNavigation(), false));
 	}
 
 	@Override

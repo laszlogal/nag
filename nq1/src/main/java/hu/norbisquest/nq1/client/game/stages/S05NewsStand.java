@@ -412,10 +412,10 @@ public class S05NewsStand extends NQ1Stage {
 		super.onRegionEnter(region);
 		if (region.equals("S - HouseFront")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.HouseFront,
-					getListener(), false));
+					getNavigation(), false));
 		} else if (region.equals("D - BusStop")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.BusStop,
-					getListener(), false));
+					getNavigation(), false));
 		}
 	}
 

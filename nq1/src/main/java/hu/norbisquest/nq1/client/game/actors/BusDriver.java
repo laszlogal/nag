@@ -1,7 +1,6 @@
 package hu.norbisquest.nq1.client.game.actors;
 
 import hu.norbisquest.nagbase.common.engine.Command;
-import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.core.layer.Layer;
 import hu.norbisquest.nagbase.core.layer.MaskedLayer;
 import hu.norbisquest.nagbase.game.Actor;
@@ -33,7 +32,6 @@ public class BusDriver extends ActorTarget {
 	private int left;
 	private boolean goingBack;
 	private BusDriverConversation cvBusDriver;
-	private ScreenNavigation listener;
 	private MaskedLayer maskedLayer;
 
 	private static final int PAUSE_BUS_STARTS = 50;
@@ -138,7 +136,7 @@ public class BusDriver extends ActorTarget {
 				list.addAll(Cmd.list(Cmd.list(
 						Norbi.say(N07.TRIED),
 						cmdDisableTopic(Topics.TICKET),
-						Cmd.fadeOutToScreen(NQ1Ids.BusStop, NQ1Stage.current().getListener(), true))));
+						Cmd.fadeOutToScreen(NQ1Ids.BusStop, NQ1Stage.current().getNavigation(), true))));
 			}
 			return list;
 		}
@@ -195,14 +193,6 @@ public class BusDriver extends ActorTarget {
 		return result;
 	}
 
-	public ScreenNavigation getListener() {
-		return listener;
-	}
-
-	public void setListener(ScreenNavigation listener) {
-		this.listener = listener;
-	}
-
 	public boolean isGoingBack() {
 		return goingBack;
 	}
@@ -212,7 +202,7 @@ public class BusDriver extends ActorTarget {
 				Cmd.fadeOutSlow(),
 				Cmd.pauseAmbient(),
 				Cmd.playSfx(BusStop.INSTANCE.bus_leave_sfx()),
-				Cmd.fadeOutToScreen(NQ1Ids.VRKFront, NQStage.current().getListener(),
+				Cmd.fadeOutToScreen(NQ1Ids.VRKFront, NQStage.current().getNavigation(),
 						false));
 	}
 

@@ -16,8 +16,8 @@ public class Engine implements GameEngine {
     }
 
     @Override
-    public void addChangeScreenHandler(ChangeScreen handler) {
-        display.addChangeHandler(handler);
+    public void addScreenChangeListener(ScreenChangeListener listener) {
+        display.addScreenChangeListener(listener);
     }
 
     @Override
@@ -41,5 +41,6 @@ public class Engine implements GameEngine {
     public void stop() {
         gameLoop.stop();
         screenCoordinator.stop();
+        display.destroy();
     }
 }

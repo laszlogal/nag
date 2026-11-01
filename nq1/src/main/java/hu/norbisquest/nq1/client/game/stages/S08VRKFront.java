@@ -203,9 +203,9 @@ public class S08VRKFront extends NQ1Stage {
 		super.onRegionEnter(region);
 		if (region.equals("A - BusStop")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.BusStop,
-					getListener(), false));
+					getNavigation(), false));
 		} else if (region.contains(" - RockKlub")) {
-			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.RockKlub, getListener(), false));
+			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.RockKlub, getNavigation(), false));
 		}
 		if (region.contains("RockKlub")) {
 			setDoorVisible(true);

@@ -231,7 +231,7 @@ public abstract class Screen extends MultiLayer implements GameScreen {
 		this.id = id;
 	}
 
-	public ScreenNavigation getListener() {
+	public ScreenNavigation getNavigation() {
 		return requireContext().navigation();
 	}
 
@@ -276,7 +276,7 @@ public abstract class Screen extends MultiLayer implements GameScreen {
 
 	public void reload() {
 		onReload();
-		getListener().navigateTo(id);
+		getNavigation().navigateTo(id);
 	}
 
 	private void onReload() {

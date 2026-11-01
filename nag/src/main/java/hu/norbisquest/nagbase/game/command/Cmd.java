@@ -47,16 +47,16 @@ public class Cmd {
 		};
 	}
 
-	public static Command changeScreen(ScreenId screenId, ScreenNavigation listener) {
-		return new ChangeScreenCommand(screenId, listener);
+	public static Command navigateTo(ScreenId screenId, ScreenNavigation navigation) {
+		return new NavigateToScreenCommand(screenId, navigation);
 	}
 
-    public static List<Command> fadeOutToScreen(ScreenId screenId, ScreenNavigation listener, boolean slow) {
+    public static List<Command> fadeOutToScreen(ScreenId screenId, ScreenNavigation navigation, boolean slow) {
 		int waitForFadeOut = slow ? 50 : 20;
 		return Arrays.asList(
 				slow ? fadeOutSlow() : fadeOut(),
 				pause(waitForFadeOut),
-				changeScreen(screenId, listener));
+				navigateTo(screenId, navigation));
 	}
 
     public static Command pause(int frames) {

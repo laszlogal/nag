@@ -9,8 +9,17 @@ import hu.norbisquest.nagbase.core.ResourceScope;
 
 /** GWT adapter that builds a screen in a detached panel before activation. */
 public final class StagedScreenParent implements ScreenParent {
-    private final FlowPanel activeParent;
-    private final FlowPanel stagingParent;
+    interface StagingContainer {
+        FlowPanel getPanel();
+
+        void activate();
+
+        void clear();
+
+        void detach();
+    }
+
+    private final StagingContainer stagingContainer;
     private final ScreenContext context;
     private final ScreenCreationCallback callback;
     private final ScreenCreationCompletion completion =
@@ -19,8 +28,15 @@ public final class StagedScreenParent implements ScreenParent {
 
     public StagedScreenParent(FlowPanel activeParent, ScreenContext context,
                               ScreenCreationCallback callback) {
-        if (activeParent == null) {
-            throw new IllegalArgumentException("activeParent must not be null");
+        this(createStagingContainer(activeParent), context, callback);
+    }
+
+    StagedScreenParent(StagingContainer stagingContainer,
+                       ScreenContext context,
+                       ScreenCreationCallback callback) {
+        if (stagingContainer == null) {
+            throw new IllegalArgumentException(
+                    "stagingContainer must not be null");
         }
         if (context == null) {
             throw new IllegalArgumentException("context must not be null");
@@ -28,12 +44,9 @@ public final class StagedScreenParent implements ScreenParent {
         if (callback == null) {
             throw new IllegalArgumentException("callback must not be null");
         }
-        this.activeParent = activeParent;
+        this.stagingContainer = stagingContainer;
         this.context = context;
         this.callback = callback;
-        this.stagingParent = new FlowPanel();
-        this.stagingParent.setSize("100%", "100%");
-        this.stagingParent.getElement().getStyle().setPosition(Position.RELATIVE);
     }
 
     @Override
@@ -48,7 +61,7 @@ public final class StagedScreenParent implements ScreenParent {
 
     @Override
     public FlowPanel getPanel() {
-        return stagingParent;
+        return stagingContainer.getPanel();
     }
 
     @Override
@@ -79,10 +92,14 @@ public final class StagedScreenParent implements ScreenParent {
         if (!completion.fail()) {
             return;
         }
-        stagingParent.clear();
 
         Throwable failure = cause != null ? cause
                 : new IllegalStateException("Screen creation failed without a cause");
+        try {
+            stagingContainer.clear();
+        } catch (Throwable cleanupFailure) {
+            addSuppressed(failure, cleanupFailure);
+        }
         ResourceScope failedScope = buildingScope;
         buildingScope = null;
         try {
@@ -90,11 +107,7 @@ public final class StagedScreenParent implements ScreenParent {
                 failedScope.destroy();
             }
         } catch (Throwable cleanupFailure) {
-            try {
-                failure.addSuppressed(cleanupFailure);
-            } catch (Throwable ignored) {
-                // Reporting the original creation failure takes priority.
-            }
+            addSuppressed(failure, cleanupFailure);
         }
         callback.onFailure(failure);
     }
@@ -123,7 +136,7 @@ public final class StagedScreenParent implements ScreenParent {
             if (activated) {
                 throw new IllegalStateException("Staged screen is already active");
             }
-            activeParent.add(stagingParent);
+            stagingContainer.activate();
             activated = true;
         }
 
@@ -133,15 +146,99 @@ public final class StagedScreenParent implements ScreenParent {
                 return;
             }
             destroyed = true;
-            stagingParent.removeFromParent();
-            stagingParent.clear();
             activated = false;
-            resources.destroy();
+            Throwable firstFailure = null;
+            try {
+                stagingContainer.detach();
+            } catch (Throwable failure) {
+                firstFailure = failure;
+            }
+            try {
+                stagingContainer.clear();
+            } catch (Throwable failure) {
+                if (firstFailure == null) {
+                    firstFailure = failure;
+                } else {
+                    addSuppressed(firstFailure, failure);
+                }
+            }
+            try {
+                resources.destroy();
+            } catch (Throwable failure) {
+                if (firstFailure == null) {
+                    firstFailure = failure;
+                } else {
+                    addSuppressed(firstFailure, failure);
+                }
+            }
+            if (firstFailure != null) {
+                rethrow(firstFailure);
+            }
         }
 
         @Override
         public boolean isDestroyed() {
             return destroyed;
+        }
+    }
+
+    private static StagingContainer createStagingContainer(
+            FlowPanel activeParent) {
+        if (activeParent == null) {
+            throw new IllegalArgumentException("activeParent must not be null");
+        }
+        return new GwtStagingContainer(activeParent);
+    }
+
+    private static void addSuppressed(Throwable primary,
+                                      Throwable suppressed) {
+        try {
+            primary.addSuppressed(suppressed);
+        } catch (Throwable ignored) {
+            // Cleanup must continue even if recording the failure fails.
+        }
+    }
+
+    private static void rethrow(Throwable failure) {
+        if (failure instanceof RuntimeException) {
+            throw (RuntimeException) failure;
+        }
+        if (failure instanceof Error) {
+            throw (Error) failure;
+        }
+        throw new RuntimeException(failure);
+    }
+
+    private static final class GwtStagingContainer
+            implements StagingContainer {
+        private final FlowPanel activeParent;
+        private final FlowPanel stagingParent = new FlowPanel();
+
+        private GwtStagingContainer(FlowPanel activeParent) {
+            this.activeParent = activeParent;
+            stagingParent.setSize("100%", "100%");
+            stagingParent.getElement().getStyle()
+                    .setPosition(Position.RELATIVE);
+        }
+
+        @Override
+        public FlowPanel getPanel() {
+            return stagingParent;
+        }
+
+        @Override
+        public void activate() {
+            activeParent.add(stagingParent);
+        }
+
+        @Override
+        public void clear() {
+            stagingParent.clear();
+        }
+
+        @Override
+        public void detach() {
+            stagingParent.removeFromParent();
         }
     }
 }

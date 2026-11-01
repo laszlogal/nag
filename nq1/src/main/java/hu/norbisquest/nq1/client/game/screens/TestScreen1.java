@@ -20,7 +20,7 @@ public class TestScreen1 extends Splash {
 
 	@Override
 	public void onClick(int x, int y) {
-		getListener().navigateTo(NQ1Settings.get().getReferer());
+		getNavigation().navigateTo(NQ1Settings.get().getReferer());
 	}
 
 

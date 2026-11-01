@@ -495,7 +495,7 @@ public abstract class NQStage extends Stage {
 				toggleDebug();
 				break;
 			case KeyCodes.KEY_Q:
-				getListener().navigateTo(getId());
+				getNavigation().navigateTo(getId());
 				break;
 		case KeyCodes.KEY_H:
 			drawHotSpot = !drawHotSpot;
@@ -559,7 +559,7 @@ public abstract class NQStage extends Stage {
 	public void goToStage(String vLabel, ScreenId id) {
 		WalkPoint wp = getGraph().getVertex(vLabel);
 		addCommandList(Arrays.asList(new WalkCommand(getNorbi(), (int) (wp.getX()), (int) (wp.getY()), true),
-				changeScreenCmd(id)));
+				navigateToCmd(id)));
 
 	}
 
@@ -617,7 +617,7 @@ public abstract class NQStage extends Stage {
 	}
 
 	public List<Command> fadeTo(ScreenId stageId) {
-		return Cmd.fadeOutToScreen(stageId, getListener(), false);
+		return Cmd.fadeOutToScreen(stageId, getNavigation(), false);
 
 	}
 

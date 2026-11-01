@@ -23,8 +23,8 @@ public abstract class NQ1Stage extends NQStage {
 	class DoorControl extends WalkControl {
 
 		private static final int GRAB_TIME = 10;
-		private ScreenNavigation listener;
-		private ScreenId exitId;
+		private final ScreenNavigation navigation;
+		private final ScreenId exitId;
 		private int grabDirection;
 
 		DoorControl(String label, Look look, ScreenId exitId) {
@@ -32,7 +32,7 @@ public abstract class NQ1Stage extends NQStage {
 			setLabel(label);
 			setLook(look);
 			this.exitId = exitId;
-			this.listener = NQ1Stage.this.getListener();
+			this.navigation = NQ1Stage.this.getNavigation();
 			switch (look) {
 				case FRONT:
 					break;
@@ -59,7 +59,7 @@ public abstract class NQ1Stage extends NQStage {
 					Norbi.Cmd.face(grabDirection),
 					Cmd.playSfx(Common.INSTANCE.knob_sfx(), false),
 					Cmd.pause(GRAB_TIME),
-					Cmd.fadeOutToScreen(exitId, listener, false));
+					Cmd.fadeOutToScreen(exitId, navigation, false));
 		}
 	}
 

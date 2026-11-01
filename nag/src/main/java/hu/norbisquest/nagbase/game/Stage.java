@@ -347,12 +347,12 @@ public abstract class Stage extends Screen
 		return true;
 	}
 
-	protected Command changeScreenCmd(final ScreenId id) {
+	protected Command navigateToCmd(final ScreenId id) {
 		return new OneShotCommand() {
 
 			@Override
 			public void start() {
-				getListener().navigateTo(id);
+				getNavigation().navigateTo(id);
 			}
 		};
 	}

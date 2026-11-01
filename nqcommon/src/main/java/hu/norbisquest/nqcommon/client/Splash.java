@@ -64,7 +64,7 @@ public class Splash extends Screen implements EventLayerListener {
 	}
 
 	protected void onFadeOut() {
-		getListener().navigateTo(next, getTransitionEffect());
+		getNavigation().navigateTo(next, getTransitionEffect());
 
 	}
 

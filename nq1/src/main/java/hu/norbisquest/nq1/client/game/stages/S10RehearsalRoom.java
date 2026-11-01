@@ -293,7 +293,7 @@ public class S10RehearsalRoom extends NQ1Stage {
 					walkTo("Fuse1"),
 					Cmd.setMask(RehearsalRoom.INSTANCE.mask_top(), false),
 					walkTo("D"),
-					Cmd.fadeOutToScreen(NQ1Ids.PlayBass, getListener(),
+					Cmd.fadeOutToScreen(NQ1Ids.PlayBass, getNavigation(),
 							true));
 		}
 
@@ -355,7 +355,7 @@ public class S10RehearsalRoom extends NQ1Stage {
 		super.onRegionEnter(region);
 		if (region.equals("S - RockKlub")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.RockKlub,
-					getListener(), false));
+					getNavigation(), false));
 		}
 
 		if (region.contains("D")) {

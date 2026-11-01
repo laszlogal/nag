@@ -348,7 +348,7 @@ public class S06BusStop extends NQ1Stage {
 			return Cmd.list(walkLabel(),
 					walk(getGraph().getVertex(lbTo)),
 					Cmd.pause(GET_ON_PAUSE),
-					Cmd.fadeOutToScreen(exitId, getListener(), true));
+					Cmd.fadeOutToScreen(exitId, getNavigation(), true));
 		}
 
 	}
@@ -461,7 +461,7 @@ public class S06BusStop extends NQ1Stage {
 		super.onRegionEnter(region);
 		if (region.equals("S - NewsStand")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.NewsStand,
-					getListener(), false));
+					getNavigation(), false));
 		} else if (region.equals("B - Town")) {
 			addCommands(Norbi.Cmd.turnRight(),
 					Norbi.say(N06.NO_WALKING));

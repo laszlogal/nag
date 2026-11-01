@@ -207,10 +207,10 @@ public class S09RockKlub extends NQ1Stage {
 	public void onRegionEnter(String region) {
 		if (region.equals("A - Front")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.VRKFront,
-					getListener(), false));
+					getNavigation(), false));
 		} else if (region.contains("- RehearsalRoom")) {
 			addCommandList(Cmd.fadeOutToScreen(NQ1Ids.RehearsalRoom,
-					getListener(), false));
+					getNavigation(), false));
 
 		}
 	}

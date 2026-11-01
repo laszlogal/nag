@@ -20,7 +20,7 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
     private ScreenPresentationCallback entryCallback;
     private boolean changed;
     private boolean paused;
-    private final List<ChangeScreen> changeHandlers = new ArrayList<>();
+    private final List<ScreenChangeListener> screenChangeListeners = new ArrayList<>();
 
     public GameDisplay(ScreenTransitionPresenter transitionPresenter) {
         this(transitionPresenter, DEFAULT_READY_TIMEOUT_MS);
@@ -41,9 +41,9 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
         changed = false;
     }
 
-    void addChangeHandler(ChangeScreen handler) {
-        if (!changeHandlers.contains(handler)) {
-            changeHandlers.add(handler);
+    void addScreenChangeListener(ScreenChangeListener listener) {
+        if (!screenChangeListeners.contains(listener)) {
+            screenChangeListeners.add(listener);
         }
     }
 
@@ -92,6 +92,8 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
         transitionEffect = null;
         entryCallback = null;
         changed = false;
+        paused = false;
+        screenChangeListeners.clear();
         if (current != null) {
             current.destroy();
         }
@@ -113,14 +115,14 @@ public class GameDisplay extends NAGObject implements ScreenHost, LoopTarget {
 
     private void notifyScreenChanged(GameScreen screen) {
         changed = true;
-        for (ChangeScreen handler: changeHandlers) {
-            handler.onScreenChanged(screen);
+        for (ScreenChangeListener listener: screenChangeListeners) {
+            listener.onScreenChanged(screen);
         }
     }
 
     private void notifyStageChanged(Stage stage) {
-        for (ChangeScreen handler: changeHandlers) {
-            handler.onStageChanged(stage);
+        for (ScreenChangeListener listener: screenChangeListeners) {
+            listener.onStageChanged(stage);
         }
     }
 
