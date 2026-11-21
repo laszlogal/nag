@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import hu.norbisquest.nagbase.common.engine.Command;
 import hu.norbisquest.nagbase.common.game.ConversationTopic;
 import hu.norbisquest.nagbase.common.game.HasConversation;
+import hu.norbisquest.nagbase.common.gui.DialogManager;
 import hu.norbisquest.nagbase.core.Browser;
 import hu.norbisquest.nagbase.core.Destroyable;
 import hu.norbisquest.nagbase.game.App;
@@ -22,6 +23,7 @@ public class ConversationView extends NAGPopupPanel implements ClickHandler,
 	private static final int MIN_FONT_SIZE = 8;
 	private static final int MAX_FONT_SIZE = 20;
 	public static ConversationView INSTANCE = null;
+	private final DialogManager dialogManager;
 	private FlowPanel main;
 	private HasConversation conversation;
 	private boolean enableAutoFeed = true;
@@ -29,8 +31,9 @@ public class ConversationView extends NAGPopupPanel implements ClickHandler,
 	private List<TopicLabel> labels = null;
 	private TopicLabel selected;
 
-	private ConversationView(Scalable scaler) {
+	private ConversationView(Scalable scaler, DialogManager dialogManager) {
 		super(scaler);
+		this.dialogManager = dialogManager;
 		setStyleName(Browser.isAndroid() ? "conversationPanel-android" : "conversationPanel");
 		main = new FlowPanel();
 
@@ -41,9 +44,9 @@ public class ConversationView extends NAGPopupPanel implements ClickHandler,
 		labels = new ArrayList<>();
 	}
 
-    public static ConversationView get(Scalable scaler) {
+    public static ConversationView get(Scalable scaler, DialogManager dialogManager) {
 	    if (INSTANCE == null) {
-            INSTANCE = new ConversationView(scaler);
+            INSTANCE = new ConversationView(scaler, dialogManager);
         }
         return INSTANCE;
 	}
@@ -120,7 +123,7 @@ public class ConversationView extends NAGPopupPanel implements ClickHandler,
 	private void reopen()
 	{
 		App.debug("reopening   ");
-		App.getFeeder().addCommand(new ConversationOpen(conversation));
+		App.getFeeder().addCommand(new ConversationOpen(conversation, dialogManager));
 	}
 
 	private boolean isEnableAutoFeed() {

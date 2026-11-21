@@ -78,7 +78,7 @@ public class S08VRKFront extends NQ1Stage {
 		@Override
 		public List<Command> onUse(int x, int y) {
 			return Cmd.list(walkLabel(), Norbi.Cmd.turnRight(),
-					Punk.get().openConversation());
+					Punk.get().openConversation(getGui().getDialogManager()));
 		}
 
 		@Override

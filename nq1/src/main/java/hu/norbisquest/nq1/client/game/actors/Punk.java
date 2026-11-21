@@ -1,6 +1,7 @@
 package hu.norbisquest.nq1.client.game.actors;
 
 import hu.norbisquest.nagbase.common.engine.Command;
+import hu.norbisquest.nagbase.common.gui.DialogManager;
 import hu.norbisquest.nagbase.game.SpeechEnum;
 import hu.norbisquest.nagbase.game.command.OneShotCommand;
 import hu.norbisquest.nagbase.game.conversation.Conversation;
@@ -26,8 +27,8 @@ public class Punk extends ActorTarget {
 	private HotSpot hotSpot;
 
 	public static class Cmd extends hu.norbisquest.nagbase.game.command.Cmd {
-		public static Command openConversation() {
-			return get().openConversation();
+		public static Command openConversation(DialogManager dialogManager) {
+			return get().openConversation(dialogManager);
 		}
 
 		static Command face(final int animId) {

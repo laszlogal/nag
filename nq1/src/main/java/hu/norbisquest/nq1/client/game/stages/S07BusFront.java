@@ -47,7 +47,7 @@ public class S07BusFront extends NQ1Stage {
 
 			if (driverCameOut && !passAsked) {
 				addCommands(BusDriver.get().say(B.TICKET_OR_PASS),
-						BusDriver.get().openConversation());
+						BusDriver.get().openConversation(getGui().getDialogManager()));
 				passAsked = true;
 			}
 

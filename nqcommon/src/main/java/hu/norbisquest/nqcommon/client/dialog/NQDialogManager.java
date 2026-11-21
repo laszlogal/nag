@@ -29,7 +29,7 @@ public abstract class NQDialogManager extends AbstractDialogManager {
 
 	@Override
 	public void showConversation(HasConversation conversation) {
-		ConversationView cp = ConversationView.get(getScaler());
+		ConversationView cp = ConversationView.get(getScaler(), this);
 		cp.open(conversation);
 		add(cp);
 	}

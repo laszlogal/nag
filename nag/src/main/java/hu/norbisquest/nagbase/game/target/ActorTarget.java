@@ -4,6 +4,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.ImageResource;
 import hu.norbisquest.nagbase.common.engine.Command;
+import hu.norbisquest.nagbase.common.gui.DialogManager;
 import hu.norbisquest.nagbase.core.Tickable;
 import hu.norbisquest.nagbase.core.layer.Layer;
 import hu.norbisquest.nagbase.game.*;
@@ -299,9 +300,9 @@ public abstract class ActorTarget extends SimpleTarget implements Tickable {
 
 	protected abstract Conversation createConversation();
 
-	public Command openConversation() {
+	public Command openConversation(DialogManager dialogManager) {
 		conversation = createConversation();
-		return new ConversationOpen(conversation);
+		return new ConversationOpen(conversation, dialogManager);
 	}
 
 	protected void destroyPerson() {}

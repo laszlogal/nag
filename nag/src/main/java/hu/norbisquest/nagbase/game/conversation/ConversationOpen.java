@@ -9,11 +9,14 @@ import hu.norbisquest.nagbase.game.command.OneShotCommand;
 public class ConversationOpen extends OneShotCommand {
 
 	private final DialogManager dialogManager;
-	private HasConversation conversation;
+	private final HasConversation conversation;
 
-	public ConversationOpen(HasConversation conversation) {
+	public ConversationOpen(HasConversation conversation, DialogManager dialogManager) {
+		if (conversation == null || dialogManager == null) {
+			throw new IllegalArgumentException("Conversation and dialog manager must not be null");
+		}
 		this.conversation = conversation;
-		this.dialogManager = App.getDialogManager();
+		this.dialogManager = dialogManager;
 		
 	}
 	

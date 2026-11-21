@@ -61,7 +61,6 @@ public final class App {
 	private static GameModes mode = GameModes.NORMAL;
 	private static boolean block = false;
 	private static Inventory inventory = null;
-	private static AbstractDialogManager dialogManager = null;
 	private static ModeListener modeListener = null;
 	private static Settings settings = null;
 	private static boolean suspend = false;
@@ -203,14 +202,6 @@ public final class App {
 
 	public static boolean isSelectedItem(HotSpot.Id id) {
 		return getInventory().isSelected(id);
-	}
-
-	public static AbstractDialogManager getDialogManager() {
-		return dialogManager;
-	}
-
-	public static void setDialogManager(AbstractDialogManager dialogManager) {
-		App.dialogManager = dialogManager;
 	}
 
 	public static ModeListener getModeListener() {
@@ -357,10 +348,6 @@ public final class App {
 //		}
 //		screen.setListener(game.ge);
 //		screen.load();
-//		AbstractDialogManager mgr = App.getDialogManager();
-//		if (mgr != null) {
-//			mgr.setParent(screen);
-//		}
 //
 //		game.setScreen(screen);
 	}

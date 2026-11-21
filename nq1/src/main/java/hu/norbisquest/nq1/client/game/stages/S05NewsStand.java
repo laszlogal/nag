@@ -45,7 +45,7 @@ public class S05NewsStand extends NQ1Stage {
 			return Cmd.list(walkLabel(),
 					Norbi.say(N05.GREETINGS_NA),
 					NewsAgent.get().say(U.GREETINGS),
-					NewsAgent.get().openConversation());
+					NewsAgent.get().openConversation(getGui().getDialogManager()));
 
 		}
 
@@ -130,7 +130,7 @@ public class S05NewsStand extends NQ1Stage {
 
 			return Cmd.asList(walkLabel(),
 					Norbi.Cmd.turnRight(),
-					Hobo.get().openConversation());
+					Hobo.get().openConversation(getGui().getDialogManager()));
 		}
 
 		@Override
