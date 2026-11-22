@@ -338,7 +338,7 @@ public class S01Room extends NQ1Stage {
 	}
 
 	private void musicOn() {
-		App.getAudioManager().setMusicOn(true);
+		getAudioManager().setMusicOn(true);
 	}
 
 	@Override

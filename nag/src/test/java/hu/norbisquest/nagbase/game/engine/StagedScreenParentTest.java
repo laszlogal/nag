@@ -6,6 +6,7 @@ import hu.norbisquest.nagbase.common.engine.ScreenContext;
 import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.core.Destroyable;
 import org.junit.Test;
 
@@ -165,7 +166,7 @@ public class StagedScreenParentTest {
                                    hu.norbisquest.nagbase.common.engine.TransitionEffect effect) {
             }
         };
-        return new ScreenContext(gui, navigation);
+        return new ScreenContext(gui, navigation, new AudioManager());
     }
 
     private Object defaultValue(Class<?> type) {

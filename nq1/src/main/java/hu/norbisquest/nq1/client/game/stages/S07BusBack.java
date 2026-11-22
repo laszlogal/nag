@@ -24,7 +24,7 @@ public class S07BusBack extends NQ1Stage {
 		walkOnFloor();
 		Norbi.get().putTo("S");
 		addCommandList(sitDown());
-		addCommandList(BusDriver.busStarts());
+		addCommandList(BusDriver.busStarts(getAudioManager()));
 	}
 
 	@Override

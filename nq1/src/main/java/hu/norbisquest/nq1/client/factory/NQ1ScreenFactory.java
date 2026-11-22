@@ -5,6 +5,7 @@ import hu.norbisquest.nagbase.common.engine.ScreenContext;
 import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.game.engine.ScreenCreationCallback;
 import hu.norbisquest.nagbase.game.engine.ScreenCreator;
 import hu.norbisquest.nagbase.game.engine.ScreenFactory;
@@ -13,13 +14,15 @@ import hu.norbisquest.nagbase.game.engine.StagedScreenParent;
 /** Creates the screen identified by the NQ1 screen registry. */
 public final class NQ1ScreenFactory implements ScreenFactory {
     private final GameGUI gui;
+    private final AudioManager audioManager;
     private final FlowPanel activeParent;
 
-    public NQ1ScreenFactory(GameGUI gui) {
-        if (gui == null || gui.getContent() == null) {
-            throw new IllegalArgumentException("gui must not be null");
+    public NQ1ScreenFactory(GameGUI gui, AudioManager audioManager) {
+        if (gui == null || gui.getContent() == null || audioManager == null) {
+            throw new IllegalArgumentException("gui, its content, and audioManager must not be null");
         }
         this.gui = gui;
+        this.audioManager = audioManager;
         activeParent = gui.getContent();
     }
 
@@ -38,7 +41,7 @@ public final class NQ1ScreenFactory implements ScreenFactory {
         }
 
         StagedScreenParent parent = new StagedScreenParent(
-                activeParent, new ScreenContext(gui, navigation), callback);
+                activeParent, new ScreenContext(gui, navigation, audioManager), callback);
         try {
             creator.create(parent);
         } catch (Throwable cause) {

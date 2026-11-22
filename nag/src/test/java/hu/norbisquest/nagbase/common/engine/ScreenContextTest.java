@@ -1,6 +1,7 @@
 package hu.norbisquest.nagbase.common.engine;
 
 import hu.norbisquest.nagbase.common.gui.GameGUI;
+import hu.norbisquest.nagbase.core.AudioManager;
 import org.junit.Test;
 
 import java.lang.reflect.Proxy;
@@ -14,11 +15,13 @@ public class ScreenContextTest {
     public void exposesRequiredDependencies() {
         GameGUI gui = fakeGui();
         ScreenNavigation navigation = fakeNavigation();
+        AudioManager audioManager = new AudioManager();
 
-        ScreenContext context = new ScreenContext(gui, navigation);
+        ScreenContext context = new ScreenContext(gui, navigation, audioManager);
 
         assertSame(gui, context.gui());
         assertSame(navigation, context.navigation());
+        assertSame(audioManager, context.audioManager());
     }
 
     @Test
@@ -31,9 +34,14 @@ public class ScreenContextTest {
         assertRejected(fakeGui(), null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsNullAudioManager() {
+        new ScreenContext(fakeGui(), fakeNavigation(), null);
+    }
+
     private void assertRejected(GameGUI gui, ScreenNavigation navigation) {
         try {
-            new ScreenContext(gui, navigation);
+            new ScreenContext(gui, navigation, new AudioManager());
             fail("Expected null dependency to be rejected");
         } catch (IllegalArgumentException expected) {
             // Expected.

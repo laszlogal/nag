@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
 import hu.norbisquest.nagbase.core.Browser;
-import hu.norbisquest.nagbase.game.App;
 
 public class ButtonPanel extends FlowPanel implements ClickHandler {
     private ToggleButton fullScreenButton;
@@ -49,12 +48,6 @@ public class ButtonPanel extends FlowPanel implements ClickHandler {
 
     private void toggleFullscreen() {
         Browser.toggleFullscreen();
-        toggled = true;
-    }
-
-    private void toggleMusic() {
-        boolean musicOn = App.getAudioManager().toggleMusic();
-        App.getSettings().setMusicOn(musicOn);
         toggled = true;
     }
 

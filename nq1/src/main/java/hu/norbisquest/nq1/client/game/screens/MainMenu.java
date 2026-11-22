@@ -35,7 +35,7 @@ public final class MainMenu extends NQ1Screen {
 	@Override
 	protected void onAvailable(boolean isFirst) {
 		super.onAvailable(isFirst);
-		App.getAudioManager().loadMusic(Common.INSTANCE.mainmenu_music(), true);
+		getAudioManager().loadMusic(Common.INSTANCE.mainmenu_music(), true);
 		App.getCursor().normal();
 	}
 

@@ -1,7 +1,6 @@
 package hu.norbisquest.nq1.client.game.screens;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.engine.ScreenParent;
 import hu.norbisquest.nq1.client.data.bundle.Common;
 import hu.norbisquest.nq1.client.factory.NQ1Ids;
@@ -16,7 +15,12 @@ public final class Credits extends Splash {
 	private Credits(FlowPanel parent) {
 		super(parent, Common.INSTANCE.credits(), 800, 100, NQ1Ids.Actors);
 		setId(NQ1Ids.Credits);
-		App.getAudioManager()
+	}
+
+	@Override
+	protected void onAvailable(boolean isFirst) {
+		super.onAvailable(isFirst);
+		getAudioManager()
 				.loadMusic(Common.INSTANCE.ending_music(), true);
 	}
 

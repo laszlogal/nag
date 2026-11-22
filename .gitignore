@@ -55,3 +55,7 @@ local.properties
 ._*
 Thumbs.db
 Desktop.ini
+
+# Codex
+output/
+tmp/

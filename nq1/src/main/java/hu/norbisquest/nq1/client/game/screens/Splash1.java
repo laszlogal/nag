@@ -1,7 +1,6 @@
 package hu.norbisquest.nq1.client.game.screens;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.engine.ScreenParent;
 import hu.norbisquest.nq1.client.data.bundle.Common;
 import hu.norbisquest.nq1.client.factory.NQ1Ids;
@@ -21,7 +20,7 @@ public final class Splash1 extends Splash {
 	@Override
 	protected void onAvailable(boolean isFirst) {
 		super.onAvailable(isFirst);
-		App.getAudioManager().loadMusicNoLoop(Common.INSTANCE.splash_music(), true);
+		getAudioManager().loadMusicNoLoop(Common.INSTANCE.splash_music(), true);
 	}
 
 }

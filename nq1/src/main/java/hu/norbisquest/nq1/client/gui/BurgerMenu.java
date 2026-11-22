@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import hu.norbisquest.nagbase.common.gui.DialogManager;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.gui.MenuPanel;
 
@@ -19,15 +20,20 @@ public class BurgerMenu extends FlowPanel implements MenuPanel {
     private static final ItemTemlates TEMPLATES = GWT.create(ItemTemlates.class);
     private MenuItem mnuOn;
     private MenuItem mnuOff;
-    private DialogManager dialogManager;
+    private final DialogManager dialogManager;
+    private final AudioManager audioManager;
 
     interface ItemTemlates extends SafeHtmlTemplates {
         @Template("<div class=\"menuItem\"><img src=\"{0}\" draggable=\"false\"/>{1}</div>")
         SafeHtml item(SafeUri url, String text);
     }
 
-    public BurgerMenu(DialogManager dialogManager) {
+    public BurgerMenu(DialogManager dialogManager, AudioManager audioManager) {
         this.dialogManager = dialogManager;
+        if (audioManager == null) {
+            throw new IllegalArgumentException("audioManager must not be null");
+        }
+        this.audioManager = audioManager;
         addStyleName("burgerMenu");
         addStyleName("hidden");
         getElement().setAttribute("aria-hidden", "true");
@@ -137,7 +143,7 @@ public class BurgerMenu extends FlowPanel implements MenuPanel {
     }
 
     private void update() {
-        boolean musicOn = App.getAudioManager().isMusicPlaying();
+        boolean musicOn = audioManager.isMusicPlaying();
         mnuOn.setVisible(musicOn);
         mnuOff.setVisible(!musicOn);
     }
@@ -148,12 +154,12 @@ public class BurgerMenu extends FlowPanel implements MenuPanel {
     }
 
     private void musicOn() {
-        App.getAudioManager().toggleMusic();
+        audioManager.toggleMusic();
     }
 
 
     private void musicOff() {
-        App.getAudioManager().setMusicOn(false);
+        audioManager.setMusicOn(false);
     }
 
     private void onMenu() {

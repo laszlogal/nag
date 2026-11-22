@@ -3,6 +3,7 @@ package hu.norbisquest.nagbase.game.gui;
 import com.google.gwt.resources.client.TextResource;
 import hu.norbisquest.nagbase.common.gui.DialogManager;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.core.Browser;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Cursor;
@@ -29,7 +30,8 @@ public abstract class GameBuilder {
         injectStyles();
         App.getInventory().setFactory(getItemFactory());
 
-        gui = createGui(createDialogManager());
+        AudioManager audioManager = new AudioManager();
+        gui = createGui(createDialogManager(), audioManager);
         GameDisplay display = new GameDisplay(effect -> {
             switch (effect) {
                 case FADE_IN:
@@ -43,7 +45,7 @@ public abstract class GameBuilder {
                             "Unsupported transition effect: " + effect);
             }
         });
-        ScreenFactory screenFactory = createScreenFactory(gui);
+        ScreenFactory screenFactory = createScreenFactory(gui, audioManager);
         GameLoop gameLoop = new GameLoop(display, new GwtFrameScheduler(), fps);
         ScreenCoordinator coordinator = new ScreenCoordinator(
                 screenFactory,
@@ -71,9 +73,9 @@ public abstract class GameBuilder {
     protected abstract List<TextResource> getCssResources();
 
 
-    public abstract ScreenFactory createScreenFactory(GameGUI gui);
+    public abstract ScreenFactory createScreenFactory(GameGUI gui, AudioManager audioManager);
 
-    public abstract GameGUI createGui(DialogManager dialogManager);
+    public abstract GameGUI createGui(DialogManager dialogManager, AudioManager audioManager);
 
 
     public Engine getEngine() {

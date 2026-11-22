@@ -7,20 +7,12 @@ public class AudioManager {
 	private static final int MUSIC_CHANNEL_ID = 0;
 	private static final int AMBIENT_CHANNEL_ID = 1;
 	private static final double MUSIC_HIGH = 1.0;
-	private static AudioManager INSTANCE = null;
 	private NAGAudio music = null;
 	private NAGAudio ambientNoise = null;
 
-	private AudioManager() {
+	public AudioManager() {
 		music = new NAGAudio();
 		ambientNoise = new NAGAudio();
-	}
-
-	public static AudioManager get() {
-		if (INSTANCE == null) {
-			INSTANCE = new AudioManager();
-		}
-		return INSTANCE;
 	}
 
 	public static IAudioChannel createAudioChannel() {

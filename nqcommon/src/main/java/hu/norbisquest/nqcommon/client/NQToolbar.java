@@ -10,6 +10,7 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Image;
 import hu.norbisquest.nagbase.common.gui.DialogManager;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.core.Browser;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.App.GameModes;
@@ -26,6 +27,7 @@ public abstract class NQToolbar extends Toolbar
 		ContextMenuHandler {
 
 	private final DialogManager dialogManager;
+    private final AudioManager audioManager;
 
 	private class NQToolbarButton extends Toolbar.ToolbarButton {
 
@@ -111,8 +113,12 @@ public abstract class NQToolbar extends Toolbar
 	private ItemButton itemButton = null;
 	private List<ModeButton> modeButtons = null;
 
-	protected NQToolbar(DialogManager dialogManager) {
+	protected NQToolbar(DialogManager dialogManager, AudioManager audioManager) {
 		this.dialogManager = dialogManager;
+        if (audioManager == null) {
+            throw new IllegalArgumentException("audioManager must not be null");
+        }
+        this.audioManager = audioManager;
 		fullChooser = true;
         modeButtons = new ArrayList<>();
 
@@ -252,7 +258,7 @@ public abstract class NQToolbar extends Toolbar
 	}
 
 	private void toggleMusic() {
-		boolean musicOn = App.getAudioManager().toggleMusic();
+		boolean musicOn = audioManager.toggleMusic();
 		btnMusic.getUpFace().setImage(musicOn ? imgMusicOn : imgMusicOff);
 		App.getSettings().setMusicOn(musicOn);
 	}

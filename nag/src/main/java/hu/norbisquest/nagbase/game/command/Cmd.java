@@ -4,6 +4,7 @@ import com.google.gwt.resources.client.DataResource;
 import hu.norbisquest.nagbase.common.engine.Command;
 import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.App.GameModes;
 import hu.norbisquest.nagbase.game.Stage;
@@ -189,22 +190,22 @@ public class Cmd {
 		};
 	}
 
-	public static Command pauseAmbient() {
+	public static Command pauseAmbient(AudioManager audioManager) {
 		return new OneShotCommand() {
 
 			@Override
 			public void start() {
-				App.getAudioManager().pauseAmbientNoise();
+				audioManager.pauseAmbientNoise();
 			}
 		};
 	}
 
-	public static Command pauseMusic() {
+	public static Command pauseMusic(AudioManager audioManager) {
 		return new OneShotCommand() {
 
 			@Override
 			public void start() {
-				App.getAudioManager().pauseAmbientNoise();
+				audioManager.pauseAmbientNoise();
 			}
 		};
 	}

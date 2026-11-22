@@ -9,6 +9,7 @@ import hu.norbisquest.nagbase.common.engine.GameScreen;
 import hu.norbisquest.nagbase.common.gui.DialogManager;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
 import hu.norbisquest.nagbase.common.gui.HasZoom;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.game.AbstractDialogManager;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Stage;
@@ -16,6 +17,7 @@ import hu.norbisquest.nagbase.game.Stage;
 public abstract class GameGuiSimple extends FlowPanel implements GameGUI {
 
 	private final DialogManager dialogManager;
+	private final AudioManager audioManager;
 	private FlowPanel content;
 	private Toolbar toolbar;
 
@@ -23,8 +25,12 @@ public abstract class GameGuiSimple extends FlowPanel implements GameGUI {
 	private Scalable scaler;
 	private Zoomer zoomer;
 
-	public GameGuiSimple(DialogManager dialogManager) {
+	public GameGuiSimple(DialogManager dialogManager, AudioManager audioManager) {
 		this.dialogManager = dialogManager;
+		if (audioManager == null) {
+			throw new IllegalArgumentException("audioManager must not be null");
+		}
+		this.audioManager = audioManager;
 		menu = createMenu();
 		toolbar = createToolBar();
 
@@ -56,6 +62,10 @@ public abstract class GameGuiSimple extends FlowPanel implements GameGUI {
 		getDialogManager().resize();
 	}
 
+
+	protected final AudioManager getAudioManager() {
+		return audioManager;
+	}
 
 	protected abstract MenuPanel createMenu();
 	protected abstract Toolbar createToolBar();

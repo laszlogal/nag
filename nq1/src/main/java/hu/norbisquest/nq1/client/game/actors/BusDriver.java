@@ -1,6 +1,7 @@
 package hu.norbisquest.nq1.client.game.actors;
 
 import hu.norbisquest.nagbase.common.engine.Command;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.core.layer.Layer;
 import hu.norbisquest.nagbase.core.layer.MaskedLayer;
 import hu.norbisquest.nagbase.game.Actor;
@@ -147,7 +148,7 @@ public class BusDriver extends ActorTarget {
 					say(B.GO_ON_IM_BUSY),
 					Norbi.say(N07.DONT_WORRY),
 					travel(),
-					busStarts());
+					busStarts(NQStage.current().getAudioManager()));
 		}
 
 		private List<Command> joking() {
@@ -158,7 +159,7 @@ public class BusDriver extends ActorTarget {
 					Norbi.say(N07.SLOW_DOWN_MAN),
 					cmdDisableTopic(Topics.JOKING),
 					travel(),
-					busStarts());
+					busStarts(NQStage.current().getAudioManager()));
 		}
 	}
 
@@ -197,10 +198,10 @@ public class BusDriver extends ActorTarget {
 		return goingBack;
 	}
 
-	public static List<Command> busStarts() {
+	public static List<Command> busStarts(AudioManager audioManager) {
 		return Cmd.list(Cmd.pause(PAUSE_BUS_STARTS),
 				Cmd.fadeOutSlow(),
-				Cmd.pauseAmbient(),
+				Cmd.pauseAmbient(audioManager),
 				Cmd.playSfx(BusStop.INSTANCE.bus_leave_sfx()),
 				Cmd.fadeOutToScreen(NQ1Ids.VRKFront, NQStage.current().getNavigation(),
 						false));

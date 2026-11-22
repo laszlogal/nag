@@ -9,6 +9,7 @@ import hu.norbisquest.nagbase.common.engine.ScreenId;
 import hu.norbisquest.nagbase.common.engine.ScreenNavigation;
 import hu.norbisquest.nagbase.common.gui.GameGUI;
 import hu.norbisquest.nagbase.common.gui.ScreenDimension;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.core.layer.*;
 import hu.norbisquest.nagbase.game.engine.ScreenParent;
 
@@ -235,6 +236,10 @@ public abstract class Screen extends MultiLayer implements GameScreen {
 		return requireContext().navigation();
 	}
 
+	public final AudioManager getAudioManager() {
+		return requireContext().audioManager();
+	}
+
 	protected final GameGUI getGui() {
 		return requireContext().gui();
 	}
@@ -280,7 +285,5 @@ public abstract class Screen extends MultiLayer implements GameScreen {
 	}
 
 	private void onReload() {
-//		App.getAudioManager().stopMusic();
-//		App.getAudioManager().stopAmbientNoise();
 	}
 }

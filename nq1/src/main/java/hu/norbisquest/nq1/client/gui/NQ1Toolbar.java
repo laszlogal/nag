@@ -6,6 +6,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ToggleButton;
 import hu.norbisquest.nagbase.common.gui.DialogManager;
 import hu.norbisquest.nagbase.common.gui.HasMenu;
+import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.App.GameModes;
 import hu.norbisquest.nq1.client.data.bundle.Common;
@@ -20,8 +21,8 @@ public class NQ1Toolbar extends NQToolbar {
     private Image itemImage = null;
 	private HasMenu menu;
 
-	public NQ1Toolbar(DialogManager dialogManager, HasMenu menu) {
-		super(dialogManager);
+	public NQ1Toolbar(DialogManager dialogManager, HasMenu menu, AudioManager audioManager) {
+		super(dialogManager, audioManager);
 		this.menu = menu;
 	}
 

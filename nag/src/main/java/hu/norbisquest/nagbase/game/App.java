@@ -4,7 +4,6 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
-import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.game.command.CommandFeeder;
 import hu.norbisquest.nagbase.game.gui.Toolbar;
 import hu.norbisquest.nagbase.game.target.HotSpot;
@@ -285,9 +284,6 @@ public final class App {
 		game.addStyleName("nagGame");
 	}
 
-	public static AudioManager getAudioManager() {
-		return AudioManager.get();
-	}
 
 	public static int getWidth() {
 		return WIDTH;

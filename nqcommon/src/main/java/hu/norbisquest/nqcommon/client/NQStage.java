@@ -311,20 +311,20 @@ public abstract class NQStage extends Stage {
 		boolean musicOn = App.getSettings().isMusicOn();
 
 		if (!musicOn) {
-			App.getAudioManager().stopMusic();
+			getAudioManager().stopMusic();
 		}
 
 		if (res.music != null) {
-			App.getAudioManager().loadMusic(res.music, res.autoPlayMusic && musicOn);
+			getAudioManager().loadMusic(res.music, res.autoPlayMusic && musicOn);
 		} else {
-			App.getAudioManager().stopMusic();
+			getAudioManager().stopMusic();
 
 		}
 
 		if (res.ambientNoise != null) {
-			App.getAudioManager().loadAmbientNoise(res.ambientNoise);
+			getAudioManager().loadAmbientNoise(res.ambientNoise);
 		} else {
-			App.getAudioManager().stopAmbientNoise();
+			getAudioManager().stopAmbientNoise();
 		}
 
 	}
@@ -429,7 +429,7 @@ public abstract class NQStage extends Stage {
 		}
 		update();
 		if (isProcessorIdle()) {
-			App.getAudioManager().restoreMusicVolume();
+			getAudioManager().restoreMusicVolume();
 		}
 	}
 
