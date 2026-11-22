@@ -31,6 +31,30 @@ GWT compilation and development-mode tasks run this local verification automatic
 ./gradlew :nq1:gwtCompile
 ```
 
+## Fresh-clone build
+
+The clean-room build verifies that the pushed repository can be cloned and built
+without using the current checkout, its private assets, or the host Gradle cache.
+It requires Docker and an SSH key with read access to the private `nq1-assets`
+repository loaded into the host SSH agent.
+
+```shell
+ssh-add -l
+./ci/fresh-build.sh
+```
+
+By default, the script clones the `main` branch from
+`https://github.com/laszlogal/nag.git`. To verify another pushed branch or tag:
+
+```shell
+CI_REPOSITORY_REF=my-branch ./ci/fresh-build.sh
+```
+
+The container fetches the pinned private assets, runs all tests, and performs a
+production GWT compilation. It is removed after the build and deliberately does
+not reuse a Gradle cache. The repository and asset locations can be overridden
+with `CI_REPOSITORY_URL` and `NQ1_ASSETS_REPOSITORY`.
+
 ## Deploying the GWT output
 
 To copy the generated output from `nq1/build/gwt/war` into the checked-out
