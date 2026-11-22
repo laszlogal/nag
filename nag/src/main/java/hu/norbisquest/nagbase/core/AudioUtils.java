@@ -3,12 +3,9 @@ package hu.norbisquest.nagbase.core;
 import com.google.gwt.resources.client.DataResource;
 
 public class AudioUtils {
-	private static int channelCounter = 0;
 
 	static IAudioChannel createAudioChannel() {
-		return WebAudioChannel.isSupported()
-				? new WebAudioChannel(channelCounter++)
-				: new AudioChannel();
+		return new HowlerAudioChannel();
 	}
 
 	static IAudioChannel createAudioChannel(DataResource ds, int channelID, boolean autoPlay) {
@@ -83,8 +80,7 @@ public class AudioUtils {
 		return ds1 != null && ds1.getName().equals(ds2.getName());
 	}
 
-	public static native boolean canPlayMp3() /*-{
-		var a = document.createElement('audio');
-		return (a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''));
-	}-*/;
+    public static boolean canPlayMp3() {
+        return hu.norbisquest.nagbase.core.howler.HowlerLibrary.canPlayMp3();
+    }
 }

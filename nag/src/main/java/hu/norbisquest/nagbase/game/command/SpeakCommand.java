@@ -1,17 +1,18 @@
 package hu.norbisquest.nagbase.game.command;
 
 import com.google.gwt.resources.client.DataResource;
-import hu.norbisquest.nagbase.core.AudioChannel.IAudioChannelListener;
 import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.core.Browser;
 import hu.norbisquest.nagbase.core.Destroyable;
 import hu.norbisquest.nagbase.core.IAudioChannel;
+import hu.norbisquest.nagbase.core.IAudioChannel.IAudioChannelListener;
 import hu.norbisquest.nagbase.game.Actor;
 import hu.norbisquest.nagbase.game.App;
 import hu.norbisquest.nagbase.game.Walker;
 
 public class SpeakCommand extends ConditionCommand implements IAudioChannelListener, Destroyable {
 	private boolean finished;
+    private boolean started;
 	private Actor speaker;
 	private String text;
 	private int direction;
@@ -39,6 +40,7 @@ public class SpeakCommand extends ConditionCommand implements IAudioChannelListe
 
 	@Override
 	public void start() {
+        started = true;
 		finished = false;
 		playing = false;
 		if (Browser.isAndroid()) {
@@ -102,6 +104,17 @@ public class SpeakCommand extends ConditionCommand implements IAudioChannelListe
 
 	}
 
+    @Override
+    public void onError(IAudioChannel channel, String message) {
+        App.warn(message);
+        channel.destroy();
+        voice = null;
+        playing = false;
+        // Continue with the existing timed text/animation path.
+        counter = 0;
+        if (started) startTalkAnimation();
+    }
+
 	@Override
 	public String toString() {
 		return text + ", audio: " + (voice != null);
@@ -113,6 +126,7 @@ public class SpeakCommand extends ConditionCommand implements IAudioChannelListe
 	}
 
 	private void endSpeak() {
+        started = false;
 		finished = true;
 		playing = false;
 		speaker.stopTalking();

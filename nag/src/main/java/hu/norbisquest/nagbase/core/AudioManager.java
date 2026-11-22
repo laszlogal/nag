@@ -81,8 +81,7 @@ public class AudioManager {
 		return music.isPlaying();
 	}
 
-	public static native boolean canPlayMp3() /*-{
-		var a = document.createElement('audio');
-		return (a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''));
-	}-*/;
+    public static boolean canPlayMp3() {
+        return AudioUtils.canPlayMp3();
+    }
 }

@@ -2,8 +2,11 @@ package hu.norbisquest.nagbase.core;
 
 import com.google.gwt.resources.client.DataResource;
 
+import java.util.function.Supplier;
 
-    public class NAGAudio extends NAGObject {
+public class NAGAudio extends NAGObject {
+    private final Supplier<IAudioChannel> channelFactory;
+    private double volume = 1;
     private DataResource resource;
     private IAudioChannel channel;
     private int id;
@@ -11,12 +14,15 @@ import com.google.gwt.resources.client.DataResource;
     private boolean loop = false;
 
     NAGAudio() {
-        resource = null;
-        channel = null;
+        this(AudioUtils::createAudioChannel);
+    }
+
+    NAGAudio(Supplier<IAudioChannel> channelFactory) {
+        this.channelFactory = channelFactory;
     }
 
     public void load(DataResource res, int id, boolean autoPlay, boolean loop) {
-        if (sameResource(res)) {
+        if (sameResource(res) && isChannelValid()) {
             return;
         }
 
@@ -38,8 +44,13 @@ import com.google.gwt.resources.client.DataResource;
     }
 
     private void createChannel() {
-        channel = AudioUtils.createAudioChannel(resource, id, autoPlay);
+        if (resource == null) return;
+        channel = channelFactory.get();
+        channel.setId(id);
+        channel.setAutoPlay(autoPlay);
         channel.setLoop(loop);
+        channel.setVolume(volume);
+        channel.load(resource);
     }
 
     @Override
@@ -88,6 +99,7 @@ import com.google.gwt.resources.client.DataResource;
     }
 
     public void play() {
+        if (resource == null) return;
         if (!isChannelValid()) {
             createChannel();
         }
@@ -108,21 +120,24 @@ import com.google.gwt.resources.client.DataResource;
     }
 
     boolean toggle() {
-        if (resource != null && isChannelValid()) {
-            setOn(!isPlaying());
-            return !isPlaying();
-        }
-        return false;
+        if (resource == null) return false;
+        boolean enabled = !isPlaying();
+        setOn(enabled);
+        return enabled;
     }
 
     void setVolume(double volume) {
+        if (Double.isNaN(volume) || volume < 0 || volume > 1) {
+            throw new IllegalArgumentException("Audio volume must be between 0 and 1");
+        }
+        this.volume = volume;
         if (isChannelValid()) {
             channel.setVolume(volume);
         }
     }
 
     double getVolume() {
-        return isChannelValid() ? channel.getVolume(): -1;
+        return volume;
     }
 
     @Override

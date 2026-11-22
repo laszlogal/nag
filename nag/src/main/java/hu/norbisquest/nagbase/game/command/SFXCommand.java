@@ -1,9 +1,10 @@
 package hu.norbisquest.nagbase.game.command;
 
 import com.google.gwt.resources.client.DataResource;
-import hu.norbisquest.nagbase.core.AudioChannel.IAudioChannelListener;
 import hu.norbisquest.nagbase.core.AudioManager;
 import hu.norbisquest.nagbase.core.IAudioChannel;
+import hu.norbisquest.nagbase.core.IAudioChannel.IAudioChannelListener;
+import hu.norbisquest.nagbase.game.App;
 
 public class SFXCommand extends ConditionCommand
 		implements
@@ -28,8 +29,8 @@ public class SFXCommand extends ConditionCommand
 
 	@Override
 	public void start() {
-		sfx.load(res);
 		finished = !wait;
+		sfx.load(res);
 	}
 
 	@Override
@@ -67,6 +68,14 @@ public class SFXCommand extends ConditionCommand
 	@Override
 	public void onEnded(IAudioChannel channel) {
 		finished = true;
+		channel.destroy();
 	}
+
+    @Override
+    public void onError(IAudioChannel channel, String message) {
+        App.warn(message);
+        finished = true;
+        channel.destroy();
+    }
 
 }
